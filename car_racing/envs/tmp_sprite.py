@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+import random
 SCREEN_WIDTH = 450
 class Rectangle(pygame.sprite.Sprite):
     def __init__(self, center, width, height):
@@ -32,10 +33,29 @@ class ControlBar(Rectangle):
         elif self.rect.right > SCREEN_WIDTH:
             self.rect.right  = SCREEN_WIDTH
 
+class Obstacle(Rectangle):
+    def __init__(self):
+        width = random.randint(10, 60)
+        height = random.randint(10, 60)
+        centerx = random.randint(0, SCREEN_WIDTH-width)
+        centery = random.randint(0, 390-height)
+        super(Obstacle, self).__init__((centerx, centery), width, height)
+
+def check_collison(obstacle, ball):
+    if obstacle.rect.left <= ball.rect.right and obstacle.rect.right >= obstacle.right and obstacle.rect.top <= ball.rect.centery <= obstacle.rect.bottom:
+        ball.speed[0] *= -1
+    if obstacle.rect.right >= ball.rect.left and obstacle.rect.left <= obstacle.right and obstacle.rect.top <= ball.rect.centery <= obstacle.rect.bottom:
+        ball.speed[0] *= -1
+    if obstacle.rect.top <= ball.rect.bottom and obstacle.rect.bottom >= obstacle.top and obstacle.rect.left <= ball.rect.centerx <= obstacle.rect.right:
+        ball.speed[1] *= -1
+    if obstacle.rect.bottom >= ball.rect.top and obstacle.rect.top <= obstacle.bottom and obstacle.rect.left <= ball.rect.centerx <= obstacle.rect.right:
+        ball.speed[1] *= -1
+
 
 if __name__ =='__main__':
     screen = pygame.display.set_mode([450, 800])
     bar = ControlBar((225, 650), 40, 2)
+    obstacles = [Obstacle() for i in range(5)]
     running = True
     while running:
         for event in pygame.event.get():
@@ -45,6 +65,8 @@ if __name__ =='__main__':
         bar.update(pressed_keys)
         screen.fill((0,0,0))
         bar.draw(screen)
+        for obstacle in obstacles:
+            obstacle.draw(screen)
         pygame.display.flip()
 
     pygame.quit()
