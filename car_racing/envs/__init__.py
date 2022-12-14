@@ -1,4 +1,4 @@
-import pygame
+import pygame, random
 from pygame.locals import *
 
 pygame.init()
@@ -14,7 +14,7 @@ screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
 class Ball(pygame.sprite.Sprite):
 
-    def __init__(self, x_cor, y_cor, speed):
+    def __init__(self, x_cor, y_cor):
         super().__init__()
 
         """self.image = pygame.Surface([x_cor, y_cor])
@@ -22,21 +22,30 @@ class Ball(pygame.sprite.Sprite):
         self.rect = pygame.draw.circle(screen, (255, 255, 255), (x_cor,y_cor), 5)
         self.x_cor = x_cor
         self.y_cor = y_cor
+        self.survive = True
 
-    def update(self, speed):
+    def update(self, speed, bar, ball):
         """x = self.x_cor + speed[0]
         y = self.y_cor + speed[1]
         pygame.draw.circle(screen, (255, 255, 255), (x,y), 5)"""
         self.rect.move_ip(*speed)
 
+        #collision with boundary
         if self.rect.left < 0:
-            self.rect.left = 0
+            speed[0] *= -1
         elif self.rect.right > SCREEN_WIDTH:
-            self.rect.right = SCREEN_WIDTH
+            speed[0] *= -1
         if self.rect.top <= 0:
-            self.rect.top = 0
+            speed[1] *= -1
         elif self.rect.bottom >= SCREEN_HEIGHT:
-            self.rect.bottom = SCREEN_HEIGHT
+            self.survive = False
+        
+        #collision with bar
+        if self.rect.bottom == bar.rect.top and self.rect.centerx >= bar.rect.left and self.rect.centerx <= bar.rect.right:
+            speed[0] = random.randint(3,3)
+            speed[1] *= -1
+        
+            
 
     def draw(self, screen):
         pygame.draw.circle(screen, (255, 255, 255), (self.rect.centerx, self.rect.centery), 5)
@@ -61,7 +70,7 @@ class Rectangle(pygame.sprite.Sprite):
 class ControlBar(Rectangle):
     def __init__(self, center, width, height):
         super(ControlBar, self).__init__(center, width, height)
-        self.speed = 1
+        self.speed = 10
     def update(self, pressed_keys):
         if pressed_keys[K_LEFT]:
             self.rect.move_ip(-self.speed, 0)
@@ -81,10 +90,10 @@ running = True
 
 
 ball_coor = [225,400]
-ball_speed = [0,1]
+ball_speed = [5,3]
 
-ball = Ball(*ball_coor, ball_speed)
-bar = ControlBar((225, 650), 40, 2)
+ball = Ball(*ball_coor)
+bar = ControlBar((225, 650), 100, 2)
 
 while running:
     screen.fill((0, 0, 0))
@@ -99,8 +108,12 @@ while running:
     bar.update(pressed_keys)
     bar.draw(screen)
 
-    ball.update(ball_speed)
+    ball.update(ball_speed, bar, ball)
     ball.draw(screen)
+
+    if ball.survive == False:
+        ball.kill()
+        running = False
 
     pygame.display.update()
 
