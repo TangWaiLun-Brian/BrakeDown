@@ -10,7 +10,7 @@ xdim, ydim = 900, 1600
 SCREEN_WIDTH = 450
 SCREEN_HEIGHT = 800
 
-MAX_BALL_SPEED = 10
+MAX_BALL_SPEED = 20
 ACCELERTION = 0.3
 
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT]) 
@@ -22,7 +22,7 @@ class Ball(pygame.sprite.Sprite):
 
         """self.image = pygame.Surface([x_cor, y_cor])
         self.image.fill((0,0,0))"""
-        self.rect = pygame.draw.circle(screen, (255, 255, 255), (x_cor,y_cor), 5)
+        self.rect = pygame.draw.circle(screen, (255, 255, 255), (x_cor,y_cor), 3)
         self.x_cor = x_cor
         self.y_cor = y_cor
         self.survive = True
@@ -46,7 +46,7 @@ class Ball(pygame.sprite.Sprite):
         #collision with bar
         if self.rect.bottom >= bar.rect.top and self.rect.top <= bar.rect.bottom and self.rect.centerx >= bar.rect.left and self.rect.centerx <= bar.rect.right:
             
-            speed[0] += random.randint(-1,1)
+            speed[0] += random.randint(-1,1) 
             speed[1] *= -1
         
         print(speed)
@@ -96,10 +96,11 @@ running = True
 
 
 ball_coor = [225,400]
-ball_speed = [0,1.5]
+init_x = random.randint(-3, 3)
+ball_speed = [3,5]
 
 ball = Ball(*ball_coor)
-bar = ControlBar((225, 650), 100, 10)
+bar = ControlBar((225, 650), 100, 20)
 
 while running:
     screen.fill((0, 0, 0))
