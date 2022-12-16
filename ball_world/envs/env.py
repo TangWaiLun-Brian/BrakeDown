@@ -24,6 +24,7 @@ class CustomEnv(gym.Env):
         self.clock = None
         self.screen = None
 
+        self.previous_obs_collision = -1
         self.cul_reward = 0
 
 
@@ -41,12 +42,13 @@ class CustomEnv(gym.Env):
 
         if self.render_mode == True:
             pygame.display.update()
-            self.clock.tick(120)
+            self.clock.tick(240)
             pygame.display.flip()
 
 
     def get_state(self):
         state = []
+        state.append([self.ball.speed[0], self.ball.speed[1], 0, 0])
         # ball_coor
         ball_coor_state = np.array(self.ball.rect)
         ball_coor_state[2:4] += self.ball.rect[0:2]
@@ -64,15 +66,20 @@ class CustomEnv(gym.Env):
             state.append(one_obs_coor)
         
         state = np.concatenate(state,0).reshape(-1,4)
-        #print(state.shape)
+
+        print(state.shape)
         return state
 
     
     def step(self, action):
-        terminated = not self.ball.survive
         self.bar.update(action)
+        self.ball.update(self.bar)
+        self.previous_obs_collision = Collision.ball_collide_with_obstacles(self.ball, self.obstacles, self.previous_obs_collision)
+
+        terminated = not self.ball.survive
         reward = 10 if not terminated else -10000
         observation = self.get_state()
+
 
         if self.render_mode == True:
             self.render()
@@ -85,14 +92,14 @@ class CustomEnv(gym.Env):
     def reset(self):
         # generate screen
         if self.screen == None:
-
+            print("HI")
             pygame.init()
             pygame.display.init()
             self.screen = pygame.display.set_mode([self.SCREEN_WIDTH, self.SCREEN_HEIGHT])
 
         # Need to further check self. 
         self.ball = Ball.Ball(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.screen)
-        self.bar = Rectangle.ControlBar((225, 650), 40, 10, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+        self.bar = Rectangle.ControlBar((225, 650), 450, 10, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
         self.obstacles = [Rectangle.Obstacle(self.SCREEN_WIDTH) for i in range(10)]
 
 
@@ -124,7 +131,10 @@ while True:
     if pressed_keys[K_RIGHT]:
         action = 2
     
-    ball_world.step(action)
+    ob, rew, term = ball_world.step(action)
+
+    if term == True:
+        ball_world.close()
     for event in pygame.event.get():
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE: 

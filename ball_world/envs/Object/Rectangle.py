@@ -2,6 +2,7 @@ import pygame, random
 from pygame.locals import *
 import random
 
+
 class Rectangle(pygame.sprite.Sprite):
     def __init__(self, center, width, height):
         super(Rectangle, self).__init__()
