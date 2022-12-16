@@ -10,7 +10,7 @@ from Object import Ball, Rectangle, Collision
 class CustomEnv(gym.Env):
     metadata = { "render_fps": 120}
     
-    def __init__(self, render_mode=True):
+    def __init__(self, seed=1, render_mode=True):
         super().__init__()
         self.action_space = gym.spaces.Discrete(3)           #left, right, stay
         
@@ -23,6 +23,8 @@ class CustomEnv(gym.Env):
         self.render_mode = render_mode
         self.clock = None
         self.screen = None
+        self.seed = seed
+        self.rng = random.Random(seed)
 
         self.previous_obs_collision = -1
         self.cul_reward = 0
@@ -74,7 +76,7 @@ class CustomEnv(gym.Env):
     def step(self, action):
         self.bar.update(action)
         self.ball.update(self.bar)
-        self.previous_obs_collision = Collision.ball_collide_with_obstacles(self.ball, self.obstacles, self.previous_obs_collision)
+        self.previous_obs_collision = Collision.ball_collide_with_obstacles(self.ball, self.obstacles, self.previous_obs_collision, self.rng)
 
         terminated = not self.ball.survive
         reward = 10 if not terminated else -10000
@@ -100,7 +102,7 @@ class CustomEnv(gym.Env):
         # Need to further check self. 
         self.ball = Ball.Ball(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.screen)
         self.bar = Rectangle.ControlBar((225, 650), 450, 10, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
-        self.obstacles = [Rectangle.Obstacle(self.SCREEN_WIDTH) for i in range(10)]
+        self.obstacles = [Rectangle.Obstacle(self.SCREEN_WIDTH, self.rng) for i in range(10)]
 
 
         state = self.get_state()

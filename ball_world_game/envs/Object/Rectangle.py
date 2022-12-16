@@ -1,6 +1,5 @@
-import pygame, random
+import pygame
 from pygame.locals import *
-import random
 
 
 class Rectangle(pygame.sprite.Sprite):
@@ -39,9 +38,9 @@ class ControlBar(Rectangle):
             self.rect.right  = self.SCREEN_WIDTH
 
 class Obstacle(Rectangle):
-    def __init__(self, SCREEN_WIDTH):
-        width = random.randint(9, 60)
-        height = random.randint(9, 60)
-        centerx = random.randint(width // 2, SCREEN_WIDTH - width //2)
-        centery = random.randint(height//2, 390 - height // 2)
+    def __init__(self, SCREEN_WIDTH, rng):
+        width = rng.randint(9, 60)
+        height = rng.randint(9, 60)
+        centerx = rng.randint(width // 2, SCREEN_WIDTH - width //2)
+        centery = rng.randint(height//2, 390 - height // 2)
         super(Obstacle, self).__init__((centerx, centery), width, height)

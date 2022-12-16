@@ -6,7 +6,6 @@ class Ball(pygame.sprite.Sprite):
 
     def __init__(self, SCREEN_WIDTH, SCREEN_HEIGHT, screen):
         super().__init__()
-
         self.x_cor = 225
         self.y_cor = 420
         """self.image = pygame.Surface([x_cor, y_cor])
