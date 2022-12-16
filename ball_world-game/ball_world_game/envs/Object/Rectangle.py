@@ -39,8 +39,8 @@ class ControlBar(Rectangle):
 
 class Obstacle(Rectangle):
     def __init__(self, SCREEN_WIDTH, rng):
-        width = rng.randint(9, 60)
-        height = rng.randint(9, 60)
-        centerx = rng.randint(width // 2, SCREEN_WIDTH - width //2)
-        centery = rng.randint(height//2, 390 - height // 2)
+        width = rng.integers(9, 60)
+        height = rng.integers(9, 60)
+        centerx = rng.integers(width // 2, SCREEN_WIDTH - width //2)
+        centery = rng.integers(height//2, 390 - height // 2)
         super(Obstacle, self).__init__((centerx, centery), width, height)
