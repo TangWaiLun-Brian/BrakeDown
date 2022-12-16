@@ -11,7 +11,7 @@ class Rectangle(pygame.sprite.Sprite):
         self.color = (255,) * 3
         #print(self.center[0]-self.length//2, self.center[1]+self.width//2, self.center[0]+self.length//2, self.center[1]-self.width//2)
 
-        self.rect = pygame.Rect(self.center[0]-self.width//2, self.center[1]+self.height//2, self.width, self.height)
+        self.rect = pygame.Rect(self.center[0]-self.width//2, self.center[1]-self.height//2, self.width, self.height)
         #print(self.color)
 
 
@@ -22,14 +22,14 @@ class Rectangle(pygame.sprite.Sprite):
 class ControlBar(Rectangle):
     def __init__(self, center, width, height, SCREEN_WIDTH, SCREEN_HEIGHT):
         super(ControlBar, self).__init__(center, width, height)
-        self.speed = 10
+        self.speed = 5
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
 
-    def update(self, pressed_keys):
-        if pressed_keys[K_LEFT]:
+    def update(self, action):
+        if action == 0:
             self.rect.move_ip(-self.speed, 0)
-        if pressed_keys[K_RIGHT]:
+        if action == 2:
             self.rect.move_ip(self.speed, 0)
 
         if self.rect.left < 0:
@@ -41,6 +41,6 @@ class Obstacle(Rectangle):
     def __init__(self, SCREEN_WIDTH):
         width = random.randint(9, 60)
         height = random.randint(9, 60)
-        centerx = random.randint(-1, SCREEN_WIDTH - width)
-        centery = random.randint(-1, 390 - height)
+        centerx = random.randint(width // 2, SCREEN_WIDTH - width //2)
+        centery = random.randint(height//2, 390 - height // 2)
         super(Obstacle, self).__init__((centerx, centery), width, height)

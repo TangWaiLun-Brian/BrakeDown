@@ -22,22 +22,13 @@ class CustomEnv(gym.Env):
         #self.render_mode = bool(int(input("Input the render mode: ")))     # need to change to input (later) 
         self.render_mode = render_mode
         self.clock = None
-        self.window = None
+        self.screen = None
 
-    def step(self, action):  
-        if action in self.action_space():
-            self.render()
-        state = 1    
-        reward =  1           
-        done = True
-        info = {}
+        self.cul_reward = 0
 
-        if self.render_mode == True:
-            self.rend
-        return state, reward, done, info
+
 
     def render(self):
-        
         
         if self.clock is None and self.render_mode == True:
             self.clock = pygame.time.Clock()
@@ -50,7 +41,7 @@ class CustomEnv(gym.Env):
 
         if self.render_mode == True:
             pygame.display.update()
-            self.clock.tick()
+            self.clock.tick(120)
             pygame.display.flip()
 
 
@@ -75,11 +66,25 @@ class CustomEnv(gym.Env):
         state = np.concatenate(state,0).reshape(-1,4)
         #print(state.shape)
         return state
+
+    
+    def step(self, action):
+        terminated = not self.ball.survive
+        self.bar.update(action)
+        reward = 10 if not terminated else -10000
+        observation = self.get_state()
+
+        if self.render_mode == True:
+            self.render()
+
+        return observation, reward, terminated
+
+
         
 
     def reset(self):
         # generate screen
-        if self.window == None:
+        if self.screen == None:
 
             pygame.init()
             pygame.display.init()
@@ -87,31 +92,41 @@ class CustomEnv(gym.Env):
 
         # Need to further check self. 
         self.ball = Ball.Ball(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.screen)
-        self.bar = Rectangle.ControlBar((225, 650), 450, 10, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+        self.bar = Rectangle.ControlBar((225, 650), 40, 10, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
         self.obstacles = [Rectangle.Obstacle(self.SCREEN_WIDTH) for i in range(10)]
 
 
         state = self.get_state()
         
 
-        while True:
-            self.render()
-            for event in pygame.event.get():
-                if event.type == KEYDOWN:
-                    if event.key == K_ESCAPE: 
-                        pygame.quit()
-
         
+        self.render()
+              
 
         return state #ball, bar and obstaicles cooridnate
 
     def close(self):
-        if self.window is not None:
+        if self.screen is not None:
             pygame.display.quit()
             pygame.quit()
 
 
-
-
 ball_world = CustomEnv()
 ball_world.reset()
+
+while True:
+    
+    
+    pressed_keys = pygame.key.get_pressed()
+    action = 1
+    if pressed_keys[K_LEFT]:
+        action = 0
+    if pressed_keys[K_RIGHT]:
+        action = 2
+    
+    ball_world.step(action)
+    for event in pygame.event.get():
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE: 
+                ball_world.close()
+                #pygame.quit()

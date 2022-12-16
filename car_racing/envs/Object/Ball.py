@@ -8,7 +8,7 @@ class Ball(pygame.sprite.Sprite):
         super().__init__()
 
         self.x_cor = 225
-        self.y_cor = 400
+        self.y_cor = 420
         """self.image = pygame.Surface([x_cor, y_cor])
         self.image.fill((0,0,0))"""
         self.rect = pygame.draw.circle(screen, (255, 255, 255), (self.x_cor, self.y_cor), 5)
