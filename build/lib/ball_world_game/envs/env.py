@@ -5,7 +5,8 @@ import numpy as np
 import pygame, random
 from pygame.locals import *
 import random
-from Object import Ball, Rectangle, Collision
+#from Object import Ball, Rectangle, Collision
+from ball_world_game.envs.Object import Ball, Rectangle, Collision
 
 class CustomEnv(gym.Env):
     metadata = { "render_fps": 120}
@@ -118,27 +119,3 @@ class CustomEnv(gym.Env):
         if self.screen is not None:
             pygame.display.quit()
             pygame.quit()
-
-
-ball_world = CustomEnv()
-ball_world.reset()
-
-while True:
-    
-    
-    pressed_keys = pygame.key.get_pressed()
-    action = 1
-    if pressed_keys[K_LEFT]:
-        action = 0
-    if pressed_keys[K_RIGHT]:
-        action = 2
-    
-    ob, rew, term = ball_world.step(action)
-
-    if term == True:
-        ball_world.close()
-    for event in pygame.event.get():
-        if event.type == KEYDOWN:
-            if event.key == K_ESCAPE: 
-                ball_world.close()
-                #pygame.quit()

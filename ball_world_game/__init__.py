@@ -2,6 +2,6 @@ from gym.envs.registration import register
 
 # Remeber to change 'GridWorldEnv' in entry_point and also the id name
 register(
-    id="ball_world/env_main",
-    entry_point="ball_world.envs:CustomEnv",
+    id="ball_world_game/env_main",
+    entry_point="ball_world_game.envs:CustomEnv",
 )

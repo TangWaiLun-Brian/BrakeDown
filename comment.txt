@@ -1,2 +1,0 @@
-Put main program (choose human or ai player to play game) here
-To do:
