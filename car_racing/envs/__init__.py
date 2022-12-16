@@ -127,16 +127,16 @@ running = True
 
 
 ball_coor = [225,400]
-ball_speed = [3,10]
+ball_speed = [1, ]
 
 ball = Ball(*ball_coor)
-bar = ControlBar((225, 650), 100, 10)
+bar = ControlBar((225, 650), 450, 10)
 obstacles = [Obstacle() for i in range(10)]
 previous_collison = -1
 while running:
     screen.fill((0, 0, 0))
 
-    for event in pygame.event.get():
+    for event in pygame.event.get():                # inside the starter file
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE: 
                 pygame.quit()
@@ -146,7 +146,8 @@ while running:
     bar.update(pressed_keys)
     bar.draw(screen)
     have_collision = False
-    print(previous_collison)
+    #print(previous_collison)
+    print(ball_speed)
     tmp_pre = -1
     for i, obstacle in enumerate(obstacles):
         collide = check_collison(obstacle, ball, ball_speed, previous_collison, i * 4)
@@ -164,7 +165,7 @@ while running:
         obstacle.draw(screen)
     pygame.display.update()
 
-    clock.tick(60)
+    clock.tick(360)
     pygame.display.flip()
 
 pygame.quit()
