@@ -27,7 +27,7 @@ class Ball(pygame.sprite.Sprite):
         self.x_cor = x_cor
         self.y_cor = y_cor
         self.survive = True
-
+        self.collide_with_bar = False
     def update(self, speed, bar, ball):
         """x = self.x_cor + speed[0]
         y = self.y_cor + speed[1]
@@ -46,9 +46,12 @@ class Ball(pygame.sprite.Sprite):
         
         #collision with bar
         if self.rect.bottom >= bar.rect.top and self.rect.top <= bar.rect.bottom and self.rect.centerx >= bar.rect.left and self.rect.centerx <= bar.rect.right:
-            
-            speed[0] += random.uniform(-2,2)
-            speed[1] *= -1
+            if not self.collide_with_bar:
+                speed[0] += random.uniform(-2,2)
+                speed[1] *= -1
+                self.collide_with_bar = True
+        else:
+            self.collide_with_bar = False
         
         #print(speed)
         self.rect.move_ip(*speed)
@@ -99,35 +102,53 @@ class Obstacle(Rectangle):
         super(Obstacle, self).__init__((centerx, centery), width, height)
 
 
-def check_collison(obstacle, ball, ball_speed, previous, current):
+def check_collison(obstacle, ball, ball_speed, previous, current, tolerance=15):
     flag = -1
+    # if min(abs(obstacle.rect.left - ball.rect.centerx), abs(obstacle.rect.right - ball.rect.centerx)) <= min(abs(obstacle.rect.top - ball.rect.centery), abs(obstacle.rect.bottom - ball.rect.centery)):
     if obstacle.rect.left <= ball.rect.right and obstacle.rect.right >= ball.rect.left and obstacle.rect.top <= ball.rect.centery <= obstacle.rect.bottom:
         if previous != current:
             ball_speed[0] *= -1
             ball_speed[1] += random.uniform(-1, 1)
         flag = current
     elif obstacle.rect.right >= ball.rect.left and obstacle.rect.left <= ball.rect.right and obstacle.rect.top <= ball.rect.centery <= obstacle.rect.bottom:
-        if previous != current+1:
+        if previous != current + 1:
             ball_speed[0] *= -1
             ball_speed[1] += random.uniform(-1, 1)
-        flag = current+1
+        flag = current + 1
+    # else
     if obstacle.rect.top <= ball.rect.bottom and obstacle.rect.bottom >= ball.rect.top and obstacle.rect.left <= ball.rect.centerx <= obstacle.rect.right:
-        if previous != current+2:
+        if previous != current + 2:
             ball_speed[1] *= -1
             ball_speed[0] += random.uniform(-1, 1)
-        flag = current+2
+        flag = current + 2
     elif obstacle.rect.bottom >= ball.rect.top and obstacle.rect.top <= ball.rect.bottom and obstacle.rect.left <= ball.rect.centerx <= obstacle.rect.right:
-        if previous != current+3:
+        if previous != current + 3:
             ball_speed[1] *= -1
             ball_speed[0] += random.uniform(-1, 1)
-        flag = current+3
+        flag = current + 3
+
+    # adopt code method from video
+    # flag = -1
+    # if obstacle.rect.colliderect(ball.rect):
+    #     if abs(obstacle.rect.top - ball.rect.bottom) < tolerance:
+    #         ball_speed[1] *= -1
+    #         flag = current
+    #     elif abs(obstacle.rect.bottom - ball.rect.top) < tolerance:
+    #         ball_speed[1] *= -1
+    #         flag = current + 1
+    #     if abs(obstacle.rect.left - ball.rect.right) < tolerance:
+    #         ball_speed[0] *= -1
+    #         flag = current + 2
+    #     elif abs(obstacle.rect.right - ball.rect.left) < tolerance:
+    #         ball_speed[0] *= -1
+    #         flag = current + 3
     return flag
 
 running = True
 
 
 ball_coor = [225,400]
-ball_speed = [1, ]
+ball_speed = [3,10]
 
 ball = Ball(*ball_coor)
 bar = ControlBar((225, 650), 450, 10)
@@ -136,7 +157,7 @@ previous_collison = -1
 while running:
     screen.fill((0, 0, 0))
 
-    for event in pygame.event.get():                # inside the starter file
+    for event in pygame.event.get():
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE: 
                 pygame.quit()
@@ -147,7 +168,6 @@ while running:
     bar.draw(screen)
     have_collision = False
     #print(previous_collison)
-    print(ball_speed)
     tmp_pre = -1
     for i, obstacle in enumerate(obstacles):
         collide = check_collison(obstacle, ball, ball_speed, previous_collison, i * 4)
@@ -165,7 +185,7 @@ while running:
         obstacle.draw(screen)
     pygame.display.update()
 
-    clock.tick(360)
+    clock.tick(120)
     pygame.display.flip()
 
 pygame.quit()
