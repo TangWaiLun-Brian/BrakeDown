@@ -38,9 +38,9 @@ class ControlBar(Rectangle):
             self.rect.right  = self.SCREEN_WIDTH
 
 class Obstacle(Rectangle):
-    def __init__(self):
+    def __init__(self, SCREEN_WIDTH):
         width = random.randint(9, 60)
         height = random.randint(9, 60)
-        centerx = random.randint(-1, self.SCREEN_WIDTH - width)
+        centerx = random.randint(-1, SCREEN_WIDTH - width)
         centery = random.randint(-1, 390 - height)
         super(Obstacle, self).__init__((centerx, centery), width, height)
