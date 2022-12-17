@@ -14,7 +14,7 @@ parser.add_argument('--fps', type=int, default=-1)
 # May modify mode for easier testing
 parser.add_argument('--mode', type=str, choices=['human', 'human_rand', 'np_array'], default='human')
 arg = parser.parse_args()
-env = gym.make('ball_world_game/env_main', render_mode = True)
+env = gym.make('ball_world_game/env_main', render_mode = False)
 env = gym.wrappers.TimeLimit(env, max_episode_steps=arg.max_steps)
 
 if arg.fps > 0:
@@ -22,7 +22,7 @@ if arg.fps > 0:
 
 
 
-episode = 2
+episode = 10
 success_episodes = 0
 running = True
 step = 0
@@ -31,10 +31,11 @@ step = 0
 # Random Movement
 
 total_score = 0
+ 
 
 for episode in range(1, episode+1):
     env.action_space.seed(arg.seed)
-    observation, info = env.reset(seed=arg.seed)    
+    observation, info = env.reset(seed=arg.seed)
     done = False
     score = 0
     
@@ -44,12 +45,12 @@ for episode in range(1, episode+1):
         action = random.choice([0,1,2])       # randomly choose the action
         ob, rew, terminated, truncated, info = env.step(action)  #return the value after the action
         score += rew                    # calculate the culmulative score
-        if terminated == True:
-            env.close()
+        done = terminated 
 
     
     total_score += score
     print(f"Episode:{episode} Score:{score}")
+
 
 print(f"Average score: {total_score/episode}")
 env.close()
