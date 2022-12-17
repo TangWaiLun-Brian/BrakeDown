@@ -4,6 +4,13 @@ import argparse as args
 from pygame.locals import *
 import ball_world_game
 import random
+import numpy as np
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten
+from tensorflow.keras.optimizers import Adam
+from rl.agents import DQNAgent
+from rl.policy import BoltzmannQPolicy
+from rl.memory import SequentialMemory
 
 
 parser = args.ArgumentParser()
@@ -53,7 +60,49 @@ for episode in range(1, episode+1):
 
 
 print(f"Average score: {total_score/episode}")
-env.close()
+#env.close()
+
+
+
+# AI Training part
+
+
+
+def build_model(states, actions):            # pass states from the envirnment and action into the model
+    model = Sequential()
+    model.add(Flatten(input_shape=(1, states), name="Input_layer"))     # add a flatten layer to the model
+    model.add(Dense(24, activation='relu', name="Hidden_layer_1"))         # add a dense layer to the model
+    model.add(Dense(24, activation='relu', name="Hidden_layer_2"))
+    model.add(Dense(actions, activation='linear', name="Output_layer"))  # last layer output the actions
+    return model
+
+
+
+states = env.observation_space.shape[0]     
+actions = env.action_space.n
+
+model = build_model(states, actions)
+
+del model
+
+model = build_model(states, actions)
+
+print(model.summary())
+
+def build_agent(model, actions):
+    policy = BoltzmannQPolicy()
+    memory = SequentialMemory(limit=50000, window_length=1)
+    dqn = DQNAgent(model=model, memory=memory, policy=policy, nb_actions=actions, nb_steps_warmup=10, target_model_update=1e-2)
+
+    return dqn
+
+dqn = build_agent(model, actions)
+Adam._name = 'No name'
+dqn.compile(Adam(learning_rate=1e-3), metrics=['mae'])
+dqn.fit(env, nb_steps=500, visualize=False, verbose=1)
+
+scores = dqn.test(env, nb_episodes=100, visualize=False)
+print(np.mean(scores.history['episode_reward']))
 
 """while running:
     if arg.mode == 'human':
