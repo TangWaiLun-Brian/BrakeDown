@@ -26,14 +26,14 @@ class CustomEnv(gym.Env):
         upper_bound.append(speed_upper_bound)
 
         screen_lower_bound = np.array([0, 0, 0, 0]).repeat(2+10).reshape(-1, 4)
-        print(screen_lower_bound.shape)
+        #print(screen_lower_bound.shape)
         lower_bound.append(screen_lower_bound)
         screen_upper_bound = np.array([450, 800, 450, 800]).repeat(2+10).reshape(-1, 4)
         upper_bound.append(screen_upper_bound)
 
         lower_bound = np.concatenate(lower_bound, axis=None)
         upper_bound = np.concatenate(upper_bound, axis=None)
-        print(lower_bound.shape, upper_bound.shape)
+        #print(lower_bound.shape, upper_bound.shape)
         self.observation_space = spaces.box.Box(low=lower_bound, high=upper_bound, shape=((3+10)* 4,), dtype=np.float32)
         
         self.SCREEN_WIDTH = 450
@@ -97,21 +97,19 @@ class CustomEnv(gym.Env):
     
     def step(self, action):
         self.bar.update(action)
-        self.ball.update(self.bar)
+        bounce = self.ball.update(self.bar)
         self.previous_obs_collision = Collision.ball_collide_with_obstacles(self.ball, self.obstacles, self.previous_obs_collision, self.np_random)
 
         terminated = not self.ball.survive
-        reward = 10 if not terminated else -10000
+        reward = bounce if not terminated else -10000
         observation = self.get_state()
         info = self._get_info()
 
         if self.render_mode == True:
             self.render()
         #print(observation.shape)
-        if self.mode == 'AI':
-            return observation, reward, terminated, info
-        else:
-            return observation, reward, terminated, False, info
+
+        return observation, reward, terminated, info
 
 
         
@@ -122,7 +120,8 @@ class CustomEnv(gym.Env):
         if self.screen == None:
             pygame.init()
             pygame.display.init()
-            self.screen = pygame.display.set_mode([self.SCREEN_WIDTH, self.SCREEN_HEIGHT])
+            display_flag = pygame.SHOWN if self.render_mode else pygame.HIDDEN
+            self.screen = pygame.display.set_mode([self.SCREEN_WIDTH, self.SCREEN_HEIGHT], flags=display_flag)
 
         # Need to further check self. 
         self.ball = Ball.Ball(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.screen)

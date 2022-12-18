@@ -23,19 +23,11 @@ parser.add_argument('--seed', type=int, default=1)
 parser.add_argument('--fps', type=int, default=-1)
 # May modify mode for easier testing
 parser.add_argument('--mode', type=str, choices=['human', 'human_rand', 'np_array'], default='human')
+# Mat modify stage for training and testing
+parser.add_argument('--phase', type=str, choices=['train', 'test', 'visual'], default='train')
+parser.add_argument('--load_path', type=str, default='')
 arg = parser.parse_args()
-env = gym.make('ball_world_game/env_main', render_mode = False, mode='AI')
-#env = gym.wrappers.TimeLimit(env, max_episode_steps=arg.max_steps)
 
-if arg.fps > 0:
-    env.metadata['render_fps'] = arg.fps
-
-
-
-episode = 10
-success_episodes = 0
-running = True
-step = 0
 
 
 # Random Movement
@@ -62,7 +54,7 @@ total_score = 0
 #     print(f"Episode:{episode} Score:{score}")
 
 
-print(f"Average score: {total_score/episode}")
+# print(f"Average score: {total_score/episode}")
 #env.close()
 
 
@@ -80,17 +72,17 @@ def build_model(states, actions):            # pass states from the envirnment a
     return model
 
 
-print('obs shape:', env.observation_space)
-states = env.observation_space.shape[0]
-actions = env.action_space.n
 
-model = build_model(states, actions)
+# states = env.observation_space.shape[0]
+# actions = env.action_space.n
 
-del model
-
-model = build_model(states, actions)
-
-print(model.summary())
+# model = build_model(states, actions)
+#
+# del model
+#
+# model = build_model(states, actions)
+#
+# print(model.summary())
 
 def build_agent(model, actions):
     policy = BoltzmannQPolicy()
@@ -99,35 +91,62 @@ def build_agent(model, actions):
 
     return dqn
 
+def dqn_agent(env):
+    states = env.observation_space.shape[0]
+    actions = env.action_space.n
+    model = build_model(states, actions)
+
+    return build_agent(model, actions)
 #obs = env.reset()
 #obs2, _, _, _ = env.step(0)
 #print(obs.shape, obs2.shape)
-dqn = build_agent(model, actions)
+# dqn = build_agent(model, actions)
 #Adam._name = 'No name'
-dqn.compile(Adam(learning_rate=1e-3), metrics=['mae'])
-dqn.fit(env, nb_steps=10000, visualize=False, verbose=1)
 
-scores = dqn.test(env, nb_episodes=100, visualize=False)
-print(np.mean(scores.history['episode_reward']))
-dqn.save_weights('dqn_weight.h5f', overwrite=True)
-"""while running:
-    if arg.mode == 'human':
-        pressed_keys = pygame.key.get_pressed()
-        action = 1
-        if pressed_keys[K_LEFT]:
-            action = 0
-        if pressed_keys[K_RIGHT]:
-            action = 2
-    else:
-        # IMPLEMENT RANDOM ACTION
-        pass
 
-    ob, rew, terminated, truncated, info = env.step(action)
+if __name__ == '__main__':
+    env = gym.make('ball_world_game/env_main', render_mode=False, mode='AI')
+    env_visual = gym.make('ball_world_game/env_main', render_mode=True, mode='AI')
+    # env = gym.wrappers.TimeLimit(env, max_episode_steps=arg.max_steps)
 
-    if terminated == True:
+    if arg.fps > 0:
+        env.metadata['render_fps'] = arg.fps
+
+    episode = 10
+    success_episodes = 0
+    running = True
+    step = 0
+
+    dqn = dqn_agent(env)
+    dqn.load_weights('dqn_weight.h5f')
+    if arg.phase == 'train':
+        dqn.compile(Adam(learning_rate=1e-3), metrics=['mae'])
+        dqn.fit(env, nb_steps=60000, visualize=False, verbose=1)
+        dqn.save_weights('dqn_weight.h5f', overwrite=True)
         env.close()
-    for event in pygame.event.get():
-        if event.type == KEYDOWN:
-            if event.key == K_ESCAPE:
+    elif arg.phase == 'test':
+        scores = dqn.test(env_visual, nb_episodes=10, visualize=False)
+        print(np.mean(scores.history['episode_reward']))
+    elif arg.phase == 'visual':
+        # not working
+        while running:
+            if arg.mode == 'human':
+                pressed_keys = pygame.key.get_pressed()
+                action = 1
+                if pressed_keys[K_LEFT]:
+                    action = 0
+                if pressed_keys[K_RIGHT]:
+                    action = 2
+            else:
+                # IMPLEMENT RANDOM ACTION
+                pass
+
+            ob, rew, terminated, truncated, info = env.step(action)
+
+            if terminated == True:
                 env.close()
-                # pygame.quit()"""
+            for event in pygame.event.get():
+                if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        env.close()
+                        # pygame.quit()
