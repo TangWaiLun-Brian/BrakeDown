@@ -15,7 +15,7 @@ class CustomEnv(gym.Env):
         super().__init__()
         self.mode = mode
         self.action_space = gym.spaces.Discrete(3)           #left, right, stay
-        self.number_of_obs = 5
+        self.number_of_obs = 1
         max_speed = 20
         upper_bound = []
         lower_bound = []
@@ -74,14 +74,16 @@ class CustomEnv(gym.Env):
 
     def get_state(self):
         state = []
-        state.append([self.ball.speed[0], self.ball.speed[1], 0, 0])
-        # ball_coor
         ball_coor_state = np.array(self.ball.rect)
+        bar_coor_state = np.array(self.bar.rect)
+
+        state.append([self.ball.speed[0], self.ball.speed[1], ball_coor_state[0] - bar_coor_state[0], 0])
+        # ball_coor
         ball_coor_state[2:4] += self.ball.rect[0:2]
         state.append(ball_coor_state)
 
         #bar coor 
-        bar_coor_state = np.array(self.bar.rect)
+        
         bar_coor_state[2:4] += self.bar.rect[0:2]
         state.append(bar_coor_state)
 
@@ -100,13 +102,16 @@ class CustomEnv(gym.Env):
     def step(self, action):
         self.bar.update(action)
         if self.ball.update(self.bar):
-            reward = 1000
+            reward = 10000
         else:
             reward = 0
         self.previous_obs_collision = Collision.ball_collide_with_obstacles(self.ball, self.obstacles, self.previous_obs_collision, self.np_random)
 
+        ball_coor_state = np.array(self.ball.rect)
+        bar_coor_state = np.array(self.bar.rect)
+
         terminated = not self.ball.survive
-        reward += 10 if not terminated else -10000
+        reward += (450 - abs(ball_coor_state[0] - bar_coor_state[0])) 
         observation = self.get_state()
         info = self._get_info()
 

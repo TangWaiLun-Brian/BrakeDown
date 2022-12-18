@@ -14,7 +14,9 @@ class Ball(pygame.sprite.Sprite):
         self.survive = True
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
-        self.speed = [1, 2]
+        speed_x = random.randint(5,10) / 2
+        speed_y = 2
+        self.speed = [speed_x, speed_y]
 
     def update(self,  bar):
         """x = self.x_cor + self.speed[0]
@@ -40,7 +42,6 @@ class Ball(pygame.sprite.Sprite):
             bound = True
 
             
-
 
 
         #print(self.speed)

@@ -74,9 +74,9 @@ print(f"Average score: {total_score/episode}")
 def build_model(states, actions):            # pass states from the envirnment and action into the model
     model = Sequential()
     model.add(Flatten(input_shape=(1, states), name="Input_layer"))     # add a flatten layer to the model
-    model.add(Dense(128, activation='relu', name="Hidden_layer_1"))         # add a dense layer to the model
-    model.add(Dense(56, activation='relu', name="Hidden_layer_2"))
-    model.add(Dense(12, activation='sigmoid', name="Hidden_layer_3"))
+    model.add(Dense(256, activation='relu', name="Hidden_layer_1"))         # add a dense layer to the model
+    model.add(Dense(64, activation='relu', name="Hidden_layer_3"))
+    model.add(Dense(12, activation='sigmoid', name="Hidden_layer_4"))
     model.add(Dense(actions, activation='linear', name="Output_layer"))  # last layer output the actions
     return model
 
@@ -108,14 +108,18 @@ dqn = build_agent(model, actions)
 dqn.compile(Adam(learning_rate=1e-3), metrics=['mae'])
 
 dqn.fit(env, nb_steps=30000, visualize=False, verbose=1)
+env.close()
 
-scores = dqn.test(env, nb_episodes=2, visualize=False)
+env = gym.make('ball_world_game/env_main', render_mode = True, mode='AI')
+
+scores = dqn.test(env, nb_episodes=20, visualize=False)
 print(np.mean(scores.history['episode_reward']))
 dqn.save_weights('dqn_weight.h5f', overwrite=True)
 
+"""env = gym.make('ball_world_game/env_main', render_mode = True, mode='AI')
 dqn.load_weights('dqn_weight.h5f')
-scores = dqn.test(env, nb_episodes=2, visualize=False)
-print(np.mean(scores.history['episode_reward']))
+scores = dqn.test(env, nb_episodes=100, visualize=False)
+print(np.mean(scores.history['episode_reward']))"""
 
 """while running:
     if arg.mode == 'human':
