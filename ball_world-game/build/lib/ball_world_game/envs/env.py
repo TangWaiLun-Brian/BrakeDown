@@ -11,9 +11,9 @@ from ball_world_game.envs.Object import Ball, Rectangle, Collision
 class CustomEnv(gym.Env):
     metadata = { "render_fps": 120}
     
-    def __init__(self, render_mode=True):
+    def __init__(self, render_mode=True, mode='AI'):
         super().__init__()
-
+        self.mode = mode
         self.action_space = gym.spaces.Discrete(3)           #left, right, stay
         max_speed = 20
         upper_bound = []
@@ -51,8 +51,8 @@ class CustomEnv(gym.Env):
 
 
     def _get_info(self):
-        return {"ball pos": np.array(self.ball.rect.center),
-                "bar pos": np.array(self.bar.rect.center)}
+        return {"relative pos": ((np.array(self.ball.rect.center) - np.array(self.bar.rect.center))**2).sum(),
+                }
     def render(self):
         
         if self.clock is None and self.render_mode == True:
@@ -107,8 +107,11 @@ class CustomEnv(gym.Env):
 
         if self.render_mode == True:
             self.render()
-
-        return observation, reward, terminated, False, info
+        #print(observation.shape)
+        if self.mode == 'AI':
+            return observation, reward, terminated, info
+        else:
+            return observation, reward, terminated, False, info
 
 
         
@@ -134,7 +137,7 @@ class CustomEnv(gym.Env):
         self.render()
               
 
-        return state, info #ball, bar and obstaicles cooridnate
+        return state  #ball, bar and obstaicles cooridnate
 
     def close(self):
         if self.screen is not None:

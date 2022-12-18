@@ -5,14 +5,17 @@ from pygame.locals import *
 import ball_world_game
 import random
 import numpy as np
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Flatten
-from tensorflow.keras.optimizers import Adam
+import tensorflow as tf
+from keras.models import Sequential
+from keras.layers import Dense, Flatten
+from keras.optimizers import Adam
 from rl.agents import DQNAgent
 from rl.policy import BoltzmannQPolicy
 from rl.memory import SequentialMemory
 
-
+print(tf.__version__)
+print(Adam)
+print(tf.optimizers.Adam)
 parser = args.ArgumentParser()
 parser.add_argument('--episode', type=int, default=1)
 parser.add_argument('--max_steps', type=int, default=100000)
@@ -21,8 +24,8 @@ parser.add_argument('--fps', type=int, default=-1)
 # May modify mode for easier testing
 parser.add_argument('--mode', type=str, choices=['human', 'human_rand', 'np_array'], default='human')
 arg = parser.parse_args()
-env = gym.make('ball_world_game/env_main', render_mode = False)
-env = gym.wrappers.TimeLimit(env, max_episode_steps=arg.max_steps)
+env = gym.make('ball_world_game/env_main', render_mode = False, mode='AI')
+#env = gym.wrappers.TimeLimit(env, max_episode_steps=arg.max_steps)
 
 if arg.fps > 0:
     env.metadata['render_fps'] = arg.fps
@@ -40,23 +43,23 @@ step = 0
 total_score = 0
  
 
-for episode in range(1, episode+1):
-    env.action_space.seed(arg.seed)
-    observation, info = env.reset(seed=arg.seed)
-    done = False
-    score = 0
-    
-
-    while not done:
-        #env.render()        # visualize the state
-        action = random.choice([0,1,2])       # randomly choose the action
-        ob, rew, terminated, truncated, info = env.step(action)  #return the value after the action
-        score += rew                    # calculate the culmulative score
-        done = terminated 
-
-    
-    total_score += score
-    print(f"Episode:{episode} Score:{score}")
+# for episode in range(1, episode+1):
+#     env.action_space.seed(arg.seed)
+#     observation = env.reset(seed=arg.seed)
+#     done = False
+#     score = 0
+#
+#
+#     while not done:
+#         #env.render()        # visualize the state
+#         action = random.choice([0,1,2])       # randomly choose the action
+#         ob, rew, terminated, truncated, info = env.step(action)  #return the value after the action
+#         score += rew                    # calculate the culmulative score
+#         done = terminated
+#
+#
+#     total_score += score
+#     print(f"Episode:{episode} Score:{score}")
 
 
 print(f"Average score: {total_score/episode}")
@@ -77,8 +80,8 @@ def build_model(states, actions):            # pass states from the envirnment a
     return model
 
 
-
-states = env.observation_space.shape[0]     
+print('obs shape:', env.observation_space)
+states = env.observation_space.shape[0]
 actions = env.action_space.n
 
 model = build_model(states, actions)
@@ -96,14 +99,17 @@ def build_agent(model, actions):
 
     return dqn
 
+#obs = env.reset()
+#obs2, _, _, _ = env.step(0)
+#print(obs.shape, obs2.shape)
 dqn = build_agent(model, actions)
-Adam._name = 'No name'
+#Adam._name = 'No name'
 dqn.compile(Adam(learning_rate=1e-3), metrics=['mae'])
-dqn.fit(env, nb_steps=500, visualize=False, verbose=1)
+dqn.fit(env, nb_steps=10000, visualize=False, verbose=1)
 
 scores = dqn.test(env, nb_episodes=100, visualize=False)
 print(np.mean(scores.history['episode_reward']))
-
+dqn.save_weights('dqn_weight.h5f', overwrite=True)
 """while running:
     if arg.mode == 'human':
         pressed_keys = pygame.key.get_pressed()

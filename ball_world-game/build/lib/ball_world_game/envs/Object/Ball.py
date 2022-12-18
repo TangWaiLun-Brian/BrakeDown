@@ -14,7 +14,7 @@ class Ball(pygame.sprite.Sprite):
         self.survive = True
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
-        self.speed = [1.5, 8]
+        self.speed = [1.5, 4]
 
     def update(self,  bar):
         """x = self.x_cor + self.speed[0]
