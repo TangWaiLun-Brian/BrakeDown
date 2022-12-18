@@ -14,13 +14,13 @@ class Ball(pygame.sprite.Sprite):
         self.survive = True
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
-        self.speed = [1.5, 4]
+        self.speed = [1, 2]
 
     def update(self,  bar):
         """x = self.x_cor + self.speed[0]
         y = self.y_cor + self.speed[1]
         pygame.draw.circle(screen, (255, 255, 255), (x,y), 5)"""
-        
+        bound = False
 
         #collision with boundary
         if self.rect.left < 0:
@@ -37,12 +37,17 @@ class Ball(pygame.sprite.Sprite):
             
             #self.speed[0] += random.uniform(-2,2)
             self.speed[1] *= -1
+            bound = True
 
+            
 
 
 
         #print(self.speed)
         self.rect.move_ip(*self.speed)
+
+
+        return bound
             
 
     def draw(self, screen):
