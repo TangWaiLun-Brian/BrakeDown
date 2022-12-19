@@ -66,7 +66,7 @@ total_score = 0
 def build_model(states, actions):            # pass states from the envirnment and action into the model
     model = Sequential()
     model.add(Flatten(input_shape=(1, states), name="Input_layer"))     # add a flatten layer to the model
-    model.add(Dense(24, activation='relu', name="Hidden_layer_1"))         # add a dense layer to the model
+    model.add(Dense(128, activation='relu', name="Hidden_layer_1"))         # add a dense layer to the model
     model.add(Dense(24, activation='relu', name="Hidden_layer_2"))
     model.add(Dense(actions, activation='linear', name="Output_layer"))  # last layer output the actions
     return model
@@ -105,8 +105,8 @@ def dqn_agent(env):
 
 
 if __name__ == '__main__':
-    env = gym.make('ball_world_game/env_main', render_mode=False, mode='AI')
-    env_visual = gym.make('ball_world_game/env_main', render_mode=True, mode='AI')
+    env = gym.make('ball_world_game/env_main-v0', render_mode=False, mode='AI')
+    env_visual = gym.make('ball_world_game/env_main-v0', render_mode=True, mode='AI')
     # env = gym.wrappers.TimeLimit(env, max_episode_steps=arg.max_steps)
 
     if arg.fps > 0:
@@ -118,14 +118,14 @@ if __name__ == '__main__':
     step = 0
 
     dqn = dqn_agent(env)
-    dqn.load_weights('dqn_weight.h5f')
+    dqn.compile(Adam(learning_rate=1e-3), metrics=['mae'])
     if arg.phase == 'train':
-        dqn.compile(Adam(learning_rate=1e-3), metrics=['mae'])
-        dqn.fit(env, nb_steps=60000, visualize=False, verbose=1)
+        dqn.fit(env, nb_steps=100000, visualize=False, verbose=1)
         dqn.save_weights('dqn_weight.h5f', overwrite=True)
         env.close()
     elif arg.phase == 'test':
-        scores = dqn.test(env_visual, nb_episodes=10, visualize=False)
+        dqn.load_weights('dqn_weight.h5f')
+        scores = dqn.test(env_visual, nb_episodes=1, visualize=False)
         print(np.mean(scores.history['episode_reward']))
     elif arg.phase == 'visual':
         # not working
