@@ -39,7 +39,9 @@ class CustomEnv(gym.Env):
         lower_bound = np.concatenate(lower_bound, axis=None)
         upper_bound = np.concatenate(upper_bound, axis=None)
         #print(lower_bound.shape, upper_bound.shape)
-        self.observation_space = spaces.box.Box(low=lower_bound, high=upper_bound, shape=((3+10)* 4,), dtype=np.float32)
+        self.num_of_obs = 5
+        self.num_of_br = 5
+        self.observation_space = spaces.box.Box(low=lower_bound, high=upper_bound, shape=((3+self.num_of_obs+self.num_of_br)* 4,), dtype=np.float32)
         
         self.SCREEN_WIDTH = 450
         self.SCREEN_HEIGHT = 800
@@ -121,13 +123,13 @@ class CustomEnv(gym.Env):
                 hit_brake += 1
 
         self.previous_obs_collision = Collision.ball_collide_with_obstacles(self.ball, self.obstacles, self.previous_obs_collision, self.np_random)
-        
-
 
 
         terminated = not self.ball.survive
         reward = bounce if not terminated else -10000
-        reward += hit_brake * 100000
+        reward += hit_brake * 1000
+        if self.previous_obs_collision != -1:
+            reward -= 1000
         observation = self.get_state()
         info = self._get_info()
 
@@ -152,9 +154,9 @@ class CustomEnv(gym.Env):
         # Need to further check self. 
         self.ball = Ball.Ball(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.screen)
         self.bar = Rectangle.ControlBar((225, 650), 70, 10, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
-        self.obstacles = [Rectangle.Obstacle(self.SCREEN_WIDTH, self.np_random) for i in range(5)]
+        self.obstacles = [Rectangle.Obstacle(self.SCREEN_WIDTH, self.np_random) for i in range(self.num_of_obs)]
         self.brake = []
-        for i in range(5):
+        for i in range(self.num_of_br):
             brake = Rectangle.Brake(self.SCREEN_WIDTH, self.np_random)
             while pygame.sprite.spritecollide(brake, self.obstacles, False) or pygame.sprite.spritecollide(brake, self.brake, False):
                 brake = Rectangle.Brake(self.SCREEN_WIDTH, self.np_random)

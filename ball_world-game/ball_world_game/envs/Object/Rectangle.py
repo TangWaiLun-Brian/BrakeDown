@@ -58,7 +58,6 @@ class Brake(Rectangle):
             ball.speed[0] *= 0.8 
             ball.speed[0] += rng.uniform(-0.2, 0.2)
             ball.speed[1] *= 0.8
-            print(ball.speed)
             self.kill()
             return 1
         return 0

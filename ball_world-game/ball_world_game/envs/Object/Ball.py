@@ -44,14 +44,14 @@ class Ball(pygame.sprite.Sprite):
             bounce = 1
             #self.speed[0] += random.uniform(-2,2)
             self.speed[1] *= -1"""
-            sign = (self.rect.centerx - bar.rect.centerx) / abs(self.rect.centerx - bar.rect.centerx)
+            sign = 1 if self.rect.centerx - bar.rect.centerx > 0 else -1
             self.init_total_speed_squa = self.speed[0]**2 + self.speed[1]**2
             #self.dis_with_center = self.rect.centerx - bar.rect.centerx if abs(self.rect.centerx - bar.rect.centerx) > 3 else (abs(self.rect.centerx - bar.rect.centerx) / (self.rect.centerx - bar.rect.centerx)) * 3
-            self.rebounce_angle = (self.rect.centerx - bar.rect.centerx) / (bar.rect.right-bar.rect.left) * np.pi /1.5
+            self.rebounce_angle = ((self.rect.centerx - bar.rect.centerx + (sign * 3)) / (bar.rect.right-bar.rect.left) + (sign * 3))* np.pi /1.5
             self.speed[0] = np.sqrt(self.init_total_speed_squa) * np.sin(self.rebounce_angle)
             self.speed[1] = np.sqrt(self.init_total_speed_squa) * np.cos(self.rebounce_angle) * -1
             
-            #print(self.rebounce_angle, self.speed)
+            print(self.rebounce_angle, self.speed)
 
 
         #collision with brake
