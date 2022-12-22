@@ -5,8 +5,13 @@ import numpy as np
 import pygame, random
 from pygame.locals import *
 import random
-#from Object import Ball, Rectangle, Collision
-from ball_world_game.envs.Object import Ball, Rectangle, Collision
+
+
+#For test code 
+from Object import Ball, Rectangle, Collision
+
+#For setup.py install
+#from ball_world_game.envs.Object import Ball, Rectangle, Collision
 
 class CustomEnv(gym.Env):
     metadata = { "render_fps": 120}
@@ -63,6 +68,9 @@ class CustomEnv(gym.Env):
         self.bar.draw(self.screen)
         for obstacle in self.obstacles:
             obstacle.draw(self.screen)
+        
+        for brake in self.brake:
+            brake.draw(self.screen)
 
         if self.render_mode == True:
             pygame.display.update()
@@ -88,6 +96,11 @@ class CustomEnv(gym.Env):
             one_obs_coor = np.array(obstacle.rect)
             one_obs_coor[2:4] += obstacle.rect[0:2]
             state.append(one_obs_coor)
+
+        for brake in self.brake:
+            one_obs_coor = np.array(brake.rect)
+            one_obs_coor[2:4] += brake.rect[0:2]
+            state.append(one_obs_coor)
         
         state = np.concatenate(state,0).reshape(-1,4)
 
@@ -97,11 +110,24 @@ class CustomEnv(gym.Env):
     
     def step(self, action):
         self.bar.update(action)
-        bounce = self.ball.update(self.bar)
+        bounce = self.ball.update(self.bar, self.brake)
+        hit_brake = 0
+        for br in self.brake:
+            if br.update(self.ball,self.np_random):
+                new_brake = Rectangle.Brake(self.SCREEN_WIDTH, self.np_random)
+                while pygame.sprite.spritecollide(new_brake, self.obstacles, False) or pygame.sprite.spritecollide(new_brake, self.brake, False):
+                    new_brake = Rectangle.Brake(self.SCREEN_WIDTH, self.np_random)
+                self.brake.add(new_brake)
+                hit_brake += 1
+
         self.previous_obs_collision = Collision.ball_collide_with_obstacles(self.ball, self.obstacles, self.previous_obs_collision, self.np_random)
+        
+
+
 
         terminated = not self.ball.survive
         reward = bounce if not terminated else -10000
+        reward += hit_brake * 100000
         observation = self.get_state()
         info = self._get_info()
 
@@ -114,7 +140,7 @@ class CustomEnv(gym.Env):
 
         
 
-    def reset(self, seed=None, options=None):
+    def reset(self, seed=1, options=None):
         super().reset(seed=seed)
         # generate screen
         if self.screen == None:
@@ -126,7 +152,14 @@ class CustomEnv(gym.Env):
         # Need to further check self. 
         self.ball = Ball.Ball(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.screen)
         self.bar = Rectangle.ControlBar((225, 650), 70, 10, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
-        self.obstacles = [Rectangle.Obstacle(self.SCREEN_WIDTH, self.np_random) for i in range(10)]
+        self.obstacles = [Rectangle.Obstacle(self.SCREEN_WIDTH, self.np_random) for i in range(5)]
+        self.brake = []
+        for i in range(5):
+            brake = Rectangle.Brake(self.SCREEN_WIDTH, self.np_random)
+            while pygame.sprite.spritecollide(brake, self.obstacles, False) or pygame.sprite.spritecollide(brake, self.brake, False):
+                brake = Rectangle.Brake(self.SCREEN_WIDTH, self.np_random)
+            self.brake.append(brake)
+        self.brake = pygame.sprite.Group(self.brake)
 
 
         state = self.get_state()
@@ -142,3 +175,32 @@ class CustomEnv(gym.Env):
         if self.screen is not None:
             pygame.display.quit()
             pygame.quit()
+
+
+
+
+
+######### Test code ########
+
+test = CustomEnv()
+running = True
+
+test.reset()
+while running: 
+    pressed_keys = pygame.key.get_pressed()
+    action = 1
+    if pressed_keys[K_LEFT]:
+        action = 0
+    if pressed_keys[K_RIGHT]:
+        action = 2
+
+    ob, rew, terminated, info = test.step(action)
+
+    for event in pygame.event.get():
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                test.close()
+                
+    if terminated == True:
+        test.close()
+        running = False           

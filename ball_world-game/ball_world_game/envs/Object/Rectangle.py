@@ -3,12 +3,12 @@ from pygame.locals import *
 
 
 class Rectangle(pygame.sprite.Sprite):
-    def __init__(self, center, width, height):
+    def __init__(self, center, width, height, color=(255,)*3):
         super(Rectangle, self).__init__()
         self.center = center
         self.width = width
         self.height = height
-        self.color = (255,) * 3
+        self.color = color
         #print(self.center[0]-self.length//2, self.center[1]+self.width//2, self.center[0]+self.length//2, self.center[1]-self.width//2)
 
         self.rect = pygame.Rect(self.center[0]-self.width//2, self.center[1]-self.height//2, self.width, self.height)
@@ -44,3 +44,21 @@ class Obstacle(Rectangle):
         centerx = rng.integers(width // 2, SCREEN_WIDTH - width //2)
         centery = rng.integers(height//2, 390 - height // 2)
         super(Obstacle, self).__init__((centerx, centery), width, height)
+
+class Brake(Rectangle):
+    def __init__(self, SCREEN_WIDTH, rng):
+        width = 15
+        height = 15
+        centerx = rng.integers(width // 2, SCREEN_WIDTH - width //2)
+        centery = rng.integers(height//2, 390 - height // 2)
+        super(Brake, self).__init__((centerx, centery), width, height, color=(140,200,70))
+    
+    def update(self, ball, rng):
+        if self.rect.colliderect(ball):    
+            ball.speed[0] *= 0.8 
+            ball.speed[0] += rng.uniform(-0.2, 0.2)
+            ball.speed[1] *= 0.8
+            print(ball.speed)
+            self.kill()
+            return 1
+        return 0

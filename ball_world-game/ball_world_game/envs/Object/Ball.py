@@ -1,6 +1,7 @@
 import pygame, random
 from pygame.locals import *
 import random
+import numpy as np
 
 class Ball(pygame.sprite.Sprite):
 
@@ -14,9 +15,9 @@ class Ball(pygame.sprite.Sprite):
         self.survive = True
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
-        self.speed = [1.5, 4]
+        self.speed = [1.5, 3]
 
-    def update(self,  bar):
+    def update(self,  bar, brake):
         """x = self.x_cor + self.speed[0]
         y = self.y_cor + self.speed[1]
         pygame.draw.circle(screen, (255, 255, 255), (x,y), 5)"""
@@ -35,14 +36,25 @@ class Ball(pygame.sprite.Sprite):
         bounce = 0
         #collision with bar
         if self.rect.bottom >= bar.rect.top and self.rect.top <= bar.rect.bottom and self.rect.centerx >= bar.rect.left and self.rect.centerx <= bar.rect.right:
-            if self.speed[0]**2 + self.speed[1]**2 < 20**2:
+            """if self.speed[0]**2 + self.speed[1]**2 < 20**2:
                 self.speed[1] += 0.01
                 sign = 1 if self.speed[0] >= 0 else -1
                 self.speed[0] += sign * 0.01
 
             bounce = 1
             #self.speed[0] += random.uniform(-2,2)
-            self.speed[1] *= -1
+            self.speed[1] *= -1"""
+            sign = (self.rect.centerx - bar.rect.centerx) / abs(self.rect.centerx - bar.rect.centerx)
+            self.init_total_speed_squa = self.speed[0]**2 + self.speed[1]**2
+            #self.dis_with_center = self.rect.centerx - bar.rect.centerx if abs(self.rect.centerx - bar.rect.centerx) > 3 else (abs(self.rect.centerx - bar.rect.centerx) / (self.rect.centerx - bar.rect.centerx)) * 3
+            self.rebounce_angle = (self.rect.centerx - bar.rect.centerx) / (bar.rect.right-bar.rect.left) * np.pi /1.5
+            self.speed[0] = np.sqrt(self.init_total_speed_squa) * np.sin(self.rebounce_angle)
+            self.speed[1] = np.sqrt(self.init_total_speed_squa) * np.cos(self.rebounce_angle) * -1
+            
+            #print(self.rebounce_angle, self.speed)
+
+
+        #collision with brake
 
 
 

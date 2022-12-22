@@ -144,9 +144,14 @@ if __name__ == '__main__':
             ob, rew, terminated, truncated, info = env.step(action)
 
             if terminated == True:
+                env.reset()
                 env.close()
             for event in pygame.event.get():
                 if event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         env.close()
                         # pygame.quit()
+
+
+
+
