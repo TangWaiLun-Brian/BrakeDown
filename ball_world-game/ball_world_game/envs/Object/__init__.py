@@ -1,1 +1,1 @@
-#from ball_word_game.envs.Object import Ball, Collision, Rectangle
+#from Object import Ball, Collision, Rectangle

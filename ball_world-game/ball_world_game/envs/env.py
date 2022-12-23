@@ -7,17 +7,21 @@ from pygame.locals import *
 import random
 
 
+
 #For test code 
 from Object import Ball, Rectangle, Collision
+
+#For test AI
+#from ball_world_game.envs.Object import Ball, Rectangle, Collision
 
 #For setup.py install
 #from ball_world_game.envs.Object import Ball, Rectangle, Collision
 
 
 class CustomEnv(gym.Env):
-    metadata = { "render_fps": 120}
+    metadata = { "render_fps": 120, "render_modes":['human', 'rgb_array']}
     
-    def __init__(self, render_mode=True, mode='AI'):
+    def __init__(self, render_mode=None, mode='AI'):
         super().__init__()
         self.mode = mode
         self.action_space = gym.spaces.Discrete(3)           #left, right, stay
@@ -55,7 +59,8 @@ class CustomEnv(gym.Env):
         self.rng = None
 
         pygame.font.init()
-        self.font = pygame.font.Font("ball_world-game/ball_world_game/envs/breakout_font.ttf",32)
+        self.font = pygame.font.Font("ball_world-game/ball_world_game/envs/breakout_font.ttf",20)
+        print(self.font)
 
         self.previous_obs_collision = -1
         self.cul_reward = 0
@@ -79,15 +84,17 @@ class CustomEnv(gym.Env):
         for brake in self.brake:
             brake.draw(self.screen)
 
+        ### Show score and the speed
+        speed_show = self.font.render('Speed' + '{:.2f}'.format(np.sqrt(self.ball.speed[0]**2 + self.ball.speed[1]**2)), True, (255,255,0))
+        v_speed_show = self.font.render('Vertical Speed' + str(self.ball.speed[1]), False, (255,255,0))
+        self.screen.blit(speed_show, (150,10))
+
         if self.render_mode == True:
             pygame.display.update()
             self.clock.tick(CustomEnv.metadata['render_fps'])
             pygame.display.flip()
 
-        ### Show score and the speed
-        speed_show = self.font.render('Speed' + str(np.sqrt(self.ball.speed[0]**2 + self.ball.speed[1]**2)), True, (255,255,0))
-        v_speed_show = self.font.render('Vertical Speed' + str(self.ball.speed[1]), False, (255,255,0))
-        self.screen.blit(speed_show, (0,0))
+
 
 
     def get_state(self):
@@ -143,7 +150,7 @@ class CustomEnv(gym.Env):
         observation = self.get_state()
         info = self._get_info()
 
-        if self.render_mode == True:
+        if self.render_mode == 'human':
             self.render()
         #print(observation.shape)
 
@@ -154,6 +161,8 @@ class CustomEnv(gym.Env):
 
     def reset(self, seed=1, options=None):
         super().reset(seed=seed)
+        if self.render_mode == 'human':
+            self.render()
         # generate screen
         if self.screen == None:
             pygame.init()
