@@ -171,7 +171,7 @@ class CustomEnv(gym.Env):
                 while pygame.sprite.spritecollide(new_brake, self.obstacles, False) or pygame.sprite.spritecollide(new_brake, self.moving_brake, False):
                     new_brake = Rectangle.MovingBrake(self.SCREEN_WIDTH, self.rng)
                 self.moving_brake.add(new_brake)
-                hit_brake += 2
+                hit_brake -= 5
 
         self.previous_obs_collision = Collision.ball_collide_with_obstacles(self.ball, self.obstacles, self.previous_obs_collision, self.rng)
 
