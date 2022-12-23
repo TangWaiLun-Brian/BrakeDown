@@ -30,7 +30,7 @@ except:
 class CustomEnv(gym.Env):
     metadata = { "render_fps": 120, "render_modes":['human', 'rgb_array']}
     
-    def __init__(self, render_mode='human', mode='AI'):
+    def __init__(self, render_mode='True', mode='AI'):
         super().__init__()
         self.action_space = gym.spaces.Discrete(3)           #left, right, stay
         max_speed = 20
@@ -93,7 +93,7 @@ class CustomEnv(gym.Env):
         if self.mode == 'AI':
             pygame.event.get()
 
-        if self.clock is None and self.render_mode == 'human':
+        if self.clock is None and self.render_mode == 'True':
             self.clock = pygame.time.Clock()
 
         self.screen.fill((0, 0, 0))
@@ -105,14 +105,15 @@ class CustomEnv(gym.Env):
             brake.draw(self.screen)
 
         ### Show time and the speed
-        self.speed_show = self.font_small.render('Speed: ' + '{:.2f}'.format(np.sqrt(self.ball.speed[0]**2 + self.ball.speed[1]**2)), True, (255,150,0))
-        self.screen.blit(self.speed_show, (10,10))
-        cur_time = pygame.time.get_ticks()
-        survived_time = (cur_time - self.start_time) / 1000
-        sur_time_message = test.font_small.render('Survived time: '+ "{:.1f}".format(survived_time) + 's', True, (255,150,0))
-        self.screen.blit(sur_time_message, (150,10))
+        if self.render_mode == 'True':
+            self.speed_show = self.font_small.render('Speed: ' + '{:.2f}'.format(np.sqrt(self.ball.speed[0]**2 + self.ball.speed[1]**2)), True, (255,150,0))
+            self.screen.blit(self.speed_show, (10,10))
+            cur_time = pygame.time.get_ticks()
+            survived_time = (cur_time - self.start_time) / 1000
+            sur_time_message = test.font_small.render('Survived time: '+ "{:.1f}".format(survived_time) + 's', True, (255,150,0))
+            self.screen.blit(sur_time_message, (150,10))
 
-        if self.render_mode == 'human' and self.terminated != True:
+        if self.render_mode == 'True' and self.terminated != True:
             pygame.display.update()
             self.clock.tick(CustomEnv.metadata['render_fps'])
             pygame.display.flip()
@@ -175,7 +176,7 @@ class CustomEnv(gym.Env):
         observation = self.get_state()
         info = self._get_info()
 
-        if self.render_mode == 'human':
+        if self.render_mode == 'True':
             self.render()
         #print(observation.shape)
         if self.terminated ==True and self.mode != 'AI':
@@ -193,7 +194,7 @@ class CustomEnv(gym.Env):
         # generate screen
         if self.screen == None:
             pygame.init()
-            if self.render_mode == 'human':
+            if self.render_mode == 'True':
                 pygame.display.init()
                 display_flag = pygame.SHOWN if self.render_mode else pygame.HIDDEN
                 self.screen = pygame.display.set_mode([self.SCREEN_WIDTH, self.SCREEN_HEIGHT], flags=display_flag)
@@ -251,15 +252,15 @@ class CustomEnv(gym.Env):
         self.ball.speed = [0,0]
         self.screen.fill((0,0,0))
         end_game_message_time = test.font_small.render('Survived time: '+ "{:.1f}".format(total_time) + 's', True, (255,255,255))
-        self.screen.blit(end_game_message_time, (130,410))
+        self.screen.blit(end_game_message_time, (140,410))
         if self.ball.win == True:
             end_win = "You Win! :)"
         else:
             end_win = "You Lose! :("
         end_game_message_1 = test.font_large.render(end_win, True, (255,255,0))
-        self.screen.blit(end_game_message_1, (140,350))
-        end_game_message_2 = test.font_small.render('Please press ESC to leave the game', True, (255,255,0))
-        self.screen.blit(end_game_message_2, (40,450))
+        self.screen.blit(end_game_message_1, (130,350))
+        end_game_message_2 = test.font_small.render('Press ESC to leave the game', True, (255,255,0))
+        self.screen.blit(end_game_message_2, (70,450))
         pygame.display.update()
         self.clock.tick(CustomEnv.metadata['render_fps'])
         pygame.display.flip()
@@ -276,7 +277,7 @@ class CustomEnv(gym.Env):
 ######### Test code ########
 if __name__ == '__main__':
     #print("HI")
-    test = CustomEnv(mode='Human')
+    test = CustomEnv(mode='human')
     running = True
 
     test.reset()

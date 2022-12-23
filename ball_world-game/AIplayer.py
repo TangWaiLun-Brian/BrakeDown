@@ -106,8 +106,8 @@ def dqn_agent(env):
 
 if __name__ == '__main__':
 
-    env = gym.make('ball_world_game/env_main-v0', render_mode = 'rgb_array')
-    env_visual = gym.make('ball_world_game/env_main-v0', render_mode='human')
+    env = gym.make('ball_world_game/env_main-v0', render_mode = 'False')
+    env_visual = gym.make('ball_world_game/env_main-v0', render_mode= 'True')
     # env = gym.wrappers.TimeLimit(env, max_episode_steps=arg.max_steps)
 
     if arg.fps > 0:
@@ -128,7 +128,7 @@ if __name__ == '__main__':
         env.close()
     elif arg.phase == 'test':
         dqn.load_weights('dqn_weight.h5f')
-        scores = dqn.test(env_visual, nb_episodes=2, visualize=False)
+        scores = dqn.test(env_visual, nb_episodes=2)
         env.close()
         print(np.mean(scores.history['episode_reward']))
     elif arg.phase == 'visual':
