@@ -21,10 +21,10 @@ try:
 except: 
     None
 
-try:
-    from ball_world_game.envs.Object import Ball, Rectangle, Collision
-except:
-    None
+# try:
+#     from ball_world_game.envs.Object import Ball, Rectangle, Collision
+# except:
+#     None
 
 
 class CustomEnv(gym.Env):
@@ -39,6 +39,7 @@ class CustomEnv(gym.Env):
 
         self.num_of_obs = 5
         self.num_of_br = 5
+        self.num_of_mv_br = 10
 
         speed_lower_bound = np.array([-max_speed, -max_speed, 0, 0]).reshape(1, 4)
         speed_upper_bound = np.array([max_speed, max_speed, 0, 0]).reshape(1, 4)
@@ -102,6 +103,8 @@ class CustomEnv(gym.Env):
             obstacle.draw(self.screen)
         for brake in self.brake:
             brake.draw(self.screen)
+        for brake in self.moving_brake:
+            brake.draw(self.screen)
 
         ### Show time and the speed
         if self.render_mode != 'train':
@@ -162,6 +165,14 @@ class CustomEnv(gym.Env):
                 self.brake.add(new_brake)
                 hit_brake += 1
 
+        for br in self.moving_brake:
+            if br.update(self.ball,self.rng):
+                new_brake = Rectangle.MovingBrake(self.SCREEN_WIDTH, self.rng)
+                while pygame.sprite.spritecollide(new_brake, self.obstacles, False) or pygame.sprite.spritecollide(new_brake, self.moving_brake, False):
+                    new_brake = Rectangle.MovingBrake(self.SCREEN_WIDTH, self.rng)
+                self.moving_brake.add(new_brake)
+                hit_brake += 2
+
         self.previous_obs_collision = Collision.ball_collide_with_obstacles(self.ball, self.obstacles, self.previous_obs_collision, self.rng)
 
 
@@ -218,6 +229,14 @@ class CustomEnv(gym.Env):
                 brake = Rectangle.Brake(self.SCREEN_WIDTH, self.rng)
             self.brake.append(brake)
         self.brake = pygame.sprite.Group(self.brake)
+
+        self.moving_brake = []
+        for i in range(self.num_of_mv_br):
+            brake = Rectangle.MovingBrake(self.SCREEN_WIDTH, self.rng)
+            while pygame.sprite.spritecollide(brake, self.obstacles, False) or pygame.sprite.spritecollide(brake, self.brake, False) or pygame.sprite.spritecollide(brake, self.moving_brake, False):
+                brake = Rectangle.Brake(self.SCREEN_WIDTH, self.rng)
+            self.moving_brake.append(brake)
+        self.moving_brake = pygame.sprite.Group(self.moving_brake)
 
         state = self.get_state()
         info =self._get_info()

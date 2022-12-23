@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-
+import numpy as np
 
 class Rectangle(pygame.sprite.Sprite):
     def __init__(self, center, width, height, color=(255,)*3):
@@ -59,6 +59,45 @@ class Brake(Rectangle):
             ball.speed[0] *= 0.8 
             ball.speed[1] *= 0.8
             #print(ball.speed)
+            self.kill()
+            return 1
+        return 0
+
+
+class MovingBrake(Rectangle):
+    def __init__(self, SCREEN_WIDTH, rng):
+        width = 15
+        height = 15
+        self.SCREEN_WIDTH = SCREEN_WIDTH
+
+        self.x_cor_float = centerx = rng.integers(width // 2, SCREEN_WIDTH - width // 2)
+        self.y_cor_float = centery = rng.integers(height // 2, 390 - height // 2)
+        super(MovingBrake, self).__init__((centerx, centery), width, height, color=(255, 0, 0))
+
+        init_speed_x = rng.uniform(-1, 1)
+        # init_speed_x = 0.5
+        init_speed_y = np.sqrt(9 - init_speed_x ** 2)
+        self.speed = [init_speed_x, init_speed_y]
+    def update(self, ball, rng):
+        self.x_cor_float += self.speed[0]
+        self.y_cor_float += self.speed[1]
+        self.rect.centerx = int(self.x_cor_float)
+        self.rect.centery = int(self.y_cor_float)
+
+        if self.rect.left < 0 and self.speed[0] <= 0:
+            self.speed[0] *= -1
+        elif self.rect.right > self.SCREEN_WIDTH and self.speed[0] >= 0:
+            self.speed[0] *= -1
+        if self.rect.top <= 0 and self.speed[1] <= 0:
+            self.speed[1] *= -1
+        elif self.rect.bottom >= 600 and self.speed[1] >= 0:
+            self.speed[1] *= -1
+
+        if self.rect.colliderect(ball):
+            # print(ball.speed)
+            ball.speed[0] *= 1.5
+            ball.speed[1] *= 1.5
+            # print(ball.speed)
             self.kill()
             return 1
         return 0

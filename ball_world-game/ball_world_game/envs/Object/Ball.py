@@ -76,7 +76,7 @@ class Ball(pygame.sprite.Sprite):
         self.total_speed = np.sqrt(self.speed[0]**2 + self.speed[1]**2)
         if self.total_speed >= 8:
             self.survive = False
-        if self.total_speed <= 0.5 and self.total_speed > 0:
+        if self.total_speed <= 1 and self.total_speed > 0:
             self.win = True
         #self.rect.move_ip(*self.speed)
         if self.rect.centerx - bar.rect.left < 0:
