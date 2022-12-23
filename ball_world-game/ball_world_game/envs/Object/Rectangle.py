@@ -54,10 +54,11 @@ class Brake(Rectangle):
         super(Brake, self).__init__((centerx, centery), width, height, color=(140,200,70))
     
     def update(self, ball, rng):
-        if self.rect.colliderect(ball):    
+        if self.rect.colliderect(ball):
+            print(ball.speed)    
             ball.speed[0] *= 0.8 
-            ball.speed[0] += rng.uniform(-0.2, 0.2)
             ball.speed[1] *= 0.8
+            print(ball.speed)
             self.kill()
             return 1
         return 0

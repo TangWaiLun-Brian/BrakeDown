@@ -13,6 +13,7 @@ from Object import Ball, Rectangle, Collision
 #For setup.py install
 #from ball_world_game.envs.Object import Ball, Rectangle, Collision
 
+
 class CustomEnv(gym.Env):
     metadata = { "render_fps": 120}
     
@@ -53,8 +54,12 @@ class CustomEnv(gym.Env):
         self.screen = None
         self.rng = None
 
+        pygame.font.init()
+        self.font = pygame.font.Font("ball_world-game/ball_world_game/envs/breakout_font.ttf",32)
+
         self.previous_obs_collision = -1
         self.cul_reward = 0
+        self.mex_speed = 10
 
 
     def _get_info(self):
@@ -78,6 +83,11 @@ class CustomEnv(gym.Env):
             pygame.display.update()
             self.clock.tick(CustomEnv.metadata['render_fps'])
             pygame.display.flip()
+
+        ### Show score and the speed
+        speed_show = self.font.render('Speed' + str(np.sqrt(self.ball.speed[0]**2 + self.ball.speed[1]**2)), True, (255,255,0))
+        v_speed_show = self.font.render('Vertical Speed' + str(self.ball.speed[1]), False, (255,255,0))
+        self.screen.blit(speed_show, (0,0))
 
 
     def get_state(self):
@@ -112,7 +122,7 @@ class CustomEnv(gym.Env):
     
     def step(self, action):
         self.bar.update(action)
-        bounce = self.ball.update(self.bar, self.brake)
+        bounce = self.ball.update(self.bar)
         hit_brake = 0
         for br in self.brake:
             if br.update(self.ball,self.np_random):
@@ -152,7 +162,7 @@ class CustomEnv(gym.Env):
             self.screen = pygame.display.set_mode([self.SCREEN_WIDTH, self.SCREEN_HEIGHT], flags=display_flag)
 
         # Need to further check self. 
-        self.ball = Ball.Ball(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.screen)
+        self.ball = Ball.Ball(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.screen, self.np_random)
         self.bar = Rectangle.ControlBar((225, 650), 70, 10, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
         self.obstacles = [Rectangle.Obstacle(self.SCREEN_WIDTH, self.np_random) for i in range(self.num_of_obs)]
         self.brake = []
