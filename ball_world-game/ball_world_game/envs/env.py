@@ -47,17 +47,17 @@ class CustomEnv(gym.Env):
         lower_bound.append(speed_lower_bound)
         upper_bound.append(speed_upper_bound)
 
-        screen_lower_bound = np.array([0, 0, 0, 0]).repeat(2+self.num_of_obs+self.num_of_br).reshape(-1, 4)
+        screen_lower_bound = np.array([0, 0, 0, 0]).repeat(2+self.num_of_obs+self.num_of_br+self.num_of_mv_br).reshape(-1, 4)
         #print(screen_lower_bound.shape)
         lower_bound.append(screen_lower_bound)
-        screen_upper_bound = np.array([450, 800, 450, 800]).repeat(2+self.num_of_obs+self.num_of_br).reshape(-1, 4)
+        screen_upper_bound = np.array([450, 800, 450, 800]).repeat(2+self.num_of_obs+self.num_of_br+self.num_of_mv_br).reshape(-1, 4)
         upper_bound.append(screen_upper_bound)
 
         lower_bound = np.concatenate(lower_bound, axis=None)
         upper_bound = np.concatenate(upper_bound, axis=None)
         #print(lower_bound.shape, upper_bound.shape)
 
-        self.observation_space = spaces.box.Box(low=lower_bound, high=upper_bound, shape=((3+self.num_of_obs+self.num_of_br)* 4,), dtype=np.float32)
+        self.observation_space = spaces.box.Box(low=lower_bound, high=upper_bound, shape=((3+self.num_of_obs+self.num_of_br+self.num_of_mv_br)* 4,), dtype=np.float32)
         
         self.SCREEN_WIDTH = 450
         self.SCREEN_HEIGHT = 800
@@ -146,7 +146,12 @@ class CustomEnv(gym.Env):
             one_obs_coor = np.array(brake.rect)
             one_obs_coor[2:4] += brake.rect[0:2]
             state.append(one_obs_coor)
-        
+
+        for brake in self.moving_brake:
+            one_obs_coor = np.array(brake.rect)
+            one_obs_coor[2:4] += brake.rect[0:2]
+            state.append(one_obs_coor)
+
         state = np.concatenate(state,0).reshape(-1,4)
 
         #print('state:', state.shape)
