@@ -129,6 +129,7 @@ if __name__ == '__main__':
     elif arg.phase == 'test':
         dqn.load_weights('dqn_weight.h5f')
         scores = dqn.test(env_visual, nb_episodes=2, visualize=False)
+        env.close()
         print(np.mean(scores.history['episode_reward']))
     elif arg.phase == 'visual':
         # not working

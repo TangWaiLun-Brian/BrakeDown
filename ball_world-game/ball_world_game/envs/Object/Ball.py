@@ -16,12 +16,16 @@ class Ball(pygame.sprite.Sprite):
         self.image.fill((0,0,0))"""
         self.rect = pygame.draw.circle(screen, (255, 255, 255), (self.x_cor, self.y_cor), 5)
         self.survive = True
+        self.win = False
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
-        #init_speed_x = rng.uniform(-1,1)
-        init_speed_x = 0.5
+        init_speed_x = rng.uniform(-1,1)
+        #init_speed_x = 0.5
         init_speed_y = np.sqrt(9 - init_speed_x**2)
         self.speed = [init_speed_x, init_speed_y]
+
+        #for testing
+        #self.speed = [0.3, 0.3]
 
     def update(self,  bar):
         """x = self.x_cor + self.speed[0]
@@ -30,11 +34,11 @@ class Ball(pygame.sprite.Sprite):
         
 
         #collision with boundary
-        if self.rect.left < 0:
+        if self.rect.left < 0 and self.speed[0] <= 0:
             self.speed[0] *= -1
-        elif self.rect.right > self.SCREEN_WIDTH:
+        elif self.rect.right > self.SCREEN_WIDTH and self.speed[0] >= 0:
             self.speed[0] *= -1
-        if self.rect.top <= 0:
+        if self.rect.top <= 0 and self.speed[1] <= 0:
             self.speed[1] *= -1
         elif self.rect.bottom >= self.SCREEN_HEIGHT:
             self.survive = False
@@ -69,6 +73,11 @@ class Ball(pygame.sprite.Sprite):
         self.y_cor_float += self.speed[1]
         self.rect.centerx = int(self.x_cor_float)
         self.rect.centery = int(self.y_cor_float)
+        self.total_speed = np.sqrt(self.speed[0]**2 + self.speed[1]**2)
+        if self.total_speed >= 8:
+            self.survive = False
+        if self.total_speed <= 0.5:
+            self.win = True
         #self.rect.move_ip(*self.speed)
         dist = - abs(self.rect.centerx-bar.rect.centerx)
         return bounce * 0 + dist
