@@ -9,10 +9,10 @@ import random
 
 
 #For test code 
-from Object import Ball, Rectangle, Collision
+#from Object import Ball, Rectangle, Collision
 
 #For test AI
-#from ball_world_game.envs.Object import Ball, Rectangle, Collision
+from ball_world_game.envs.Object import Ball, Rectangle, Collision
 
 #For setup.py install
 #from ball_world_game.envs.Object import Ball, Rectangle, Collision
@@ -21,9 +21,8 @@ from Object import Ball, Rectangle, Collision
 class CustomEnv(gym.Env):
     metadata = { "render_fps": 120, "render_modes":['human', 'rgb_array']}
     
-    def __init__(self, render_mode=None, mode='AI'):
+    def __init__(self, render_mode='human'):
         super().__init__()
-        self.mode = mode
         self.action_space = gym.spaces.Discrete(3)           #left, right, stay
         max_speed = 20
         upper_bound = []
@@ -56,11 +55,11 @@ class CustomEnv(gym.Env):
         self.render_mode = render_mode
         self.clock = None
         self.screen = None
-        self.rng = None
+        self.rng = self.np_random
 
         pygame.font.init()
         self.font = pygame.font.Font("ball_world-game/ball_world_game/envs/breakout_font.ttf",20)
-        print(self.font)
+        #print(self.font)
 
         self.previous_obs_collision = -1
         self.cul_reward = 0
@@ -72,7 +71,7 @@ class CustomEnv(gym.Env):
                 }
     def render(self):
         
-        if self.clock is None and self.render_mode == True:
+        if self.clock is None and self.render_mode == 'human':
             self.clock = pygame.time.Clock()
 
         self.screen.fill((0, 0, 0))
@@ -80,7 +79,6 @@ class CustomEnv(gym.Env):
         self.bar.draw(self.screen)
         for obstacle in self.obstacles:
             obstacle.draw(self.screen)
-        
         for brake in self.brake:
             brake.draw(self.screen)
 
@@ -89,7 +87,7 @@ class CustomEnv(gym.Env):
         v_speed_show = self.font.render('Vertical Speed' + str(self.ball.speed[1]), False, (255,255,0))
         self.screen.blit(speed_show, (150,10))
 
-        if self.render_mode == True:
+        if self.render_mode == 'human':
             pygame.display.update()
             self.clock.tick(CustomEnv.metadata['render_fps'])
             pygame.display.flip()
@@ -132,14 +130,14 @@ class CustomEnv(gym.Env):
         bounce = self.ball.update(self.bar)
         hit_brake = 0
         for br in self.brake:
-            if br.update(self.ball,self.np_random):
-                new_brake = Rectangle.Brake(self.SCREEN_WIDTH, self.np_random)
+            if br.update(self.ball,self.rng):
+                new_brake = Rectangle.Brake(self.SCREEN_WIDTH, self.rng)
                 while pygame.sprite.spritecollide(new_brake, self.obstacles, False) or pygame.sprite.spritecollide(new_brake, self.brake, False):
-                    new_brake = Rectangle.Brake(self.SCREEN_WIDTH, self.np_random)
+                    new_brake = Rectangle.Brake(self.SCREEN_WIDTH, self.rng)
                 self.brake.add(new_brake)
                 hit_brake += 1
 
-        self.previous_obs_collision = Collision.ball_collide_with_obstacles(self.ball, self.obstacles, self.previous_obs_collision, self.np_random)
+        self.previous_obs_collision = Collision.ball_collide_with_obstacles(self.ball, self.obstacles, self.previous_obs_collision, self.rng)
 
 
         terminated = not self.ball.survive
@@ -161,27 +159,30 @@ class CustomEnv(gym.Env):
 
     def reset(self, seed=1, options=None):
         super().reset(seed=seed)
-        if self.render_mode == 'human':
-            self.render()
+        """if self.render_mode == 'human':
+            self.render()"""
         # generate screen
         if self.screen == None:
             pygame.init()
-            pygame.display.init()
-            display_flag = pygame.SHOWN if self.render_mode else pygame.HIDDEN
-            self.screen = pygame.display.set_mode([self.SCREEN_WIDTH, self.SCREEN_HEIGHT], flags=display_flag)
+            if self.render_mode == 'human':
+                pygame.display.init()
+                display_flag = pygame.SHOWN if self.render_mode else pygame.HIDDEN
+                self.screen = pygame.display.set_mode([self.SCREEN_WIDTH, self.SCREEN_HEIGHT], flags=display_flag)
+            else:
+                self.screen = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+
 
         # Need to further check self. 
-        self.ball = Ball.Ball(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.screen, self.np_random)
+        self.ball = Ball.Ball(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.screen, self.rng)
         self.bar = Rectangle.ControlBar((225, 650), 70, 10, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
-        self.obstacles = [Rectangle.Obstacle(self.SCREEN_WIDTH, self.np_random) for i in range(self.num_of_obs)]
+        self.obstacles = [Rectangle.Obstacle(self.SCREEN_WIDTH, self.rng) for i in range(self.num_of_obs)]
         self.brake = []
         for i in range(self.num_of_br):
-            brake = Rectangle.Brake(self.SCREEN_WIDTH, self.np_random)
+            brake = Rectangle.Brake(self.SCREEN_WIDTH, self.rng)
             while pygame.sprite.spritecollide(brake, self.obstacles, False) or pygame.sprite.spritecollide(brake, self.brake, False):
-                brake = Rectangle.Brake(self.SCREEN_WIDTH, self.np_random)
+                brake = Rectangle.Brake(self.SCREEN_WIDTH, self.rng)
             self.brake.append(brake)
         self.brake = pygame.sprite.Group(self.brake)
-
 
         state = self.get_state()
         info =self._get_info()
@@ -202,26 +203,27 @@ class CustomEnv(gym.Env):
 
 
 ######### Test code ########
+if __name__ == '__main__':
+    #print("HI")
+    test = CustomEnv()
+    running = True
 
-test = CustomEnv()
-running = True
+    test.reset()
+    while running: 
+        pressed_keys = pygame.key.get_pressed()
+        action = 1
+        if pressed_keys[K_LEFT]:
+            action = 0
+        if pressed_keys[K_RIGHT]:
+            action = 2
 
-test.reset()
-while running: 
-    pressed_keys = pygame.key.get_pressed()
-    action = 1
-    if pressed_keys[K_LEFT]:
-        action = 0
-    if pressed_keys[K_RIGHT]:
-        action = 2
+        ob, rew, terminated, info = test.step(action)
 
-    ob, rew, terminated, info = test.step(action)
-
-    for event in pygame.event.get():
-        if event.type == KEYDOWN:
-            if event.key == K_ESCAPE:
-                test.close()
-                
-    if terminated == True:
-        test.close()
-        running = False           
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    test.close()
+                    
+        if terminated == True:
+            test.close()
+            running = False           

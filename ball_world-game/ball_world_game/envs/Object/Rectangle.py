@@ -55,10 +55,10 @@ class Brake(Rectangle):
     
     def update(self, ball, rng):
         if self.rect.colliderect(ball):
-            print(ball.speed)    
+            #print(ball.speed)    
             ball.speed[0] *= 0.8 
             ball.speed[1] *= 0.8
-            print(ball.speed)
+            #print(ball.speed)
             self.kill()
             return 1
         return 0

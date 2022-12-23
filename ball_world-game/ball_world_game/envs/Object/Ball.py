@@ -57,7 +57,7 @@ class Ball(pygame.sprite.Sprite):
             self.speed[0] = np.sqrt(self.init_total_speed_squa) * np.sin(self.rebounce_angle)
             self.speed[1] = np.sqrt(self.init_total_speed_squa) * np.cos(self.rebounce_angle) * -1
             
-            print(self.rebounce_angle, self.speed)
+            #print(self.rebounce_angle, self.speed)
 
 
 
