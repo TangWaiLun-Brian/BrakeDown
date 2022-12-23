@@ -79,8 +79,18 @@ class Ball(pygame.sprite.Sprite):
         if self.total_speed <= 0.5 and self.total_speed > 0:
             self.win = True
         #self.rect.move_ip(*self.speed)
-        dist = - abs(self.rect.centerx-bar.rect.centerx)
-        return bounce * 0 + dist
+        if self.rect.centerx - bar.rect.left < 0:
+            dist = self.rect.centerx - bar.rect.left
+        elif self.rect.centerx - bar.rect.right > 0:
+            dist = bar.rect.right - self.rect.centerx
+        else:
+            dist = int(((bar.rect.right-bar.rect.left) / 2 - abs(bar.rect.centerx - self.rect.centerx))  * 0.25 )
+        vert_dist = self.rect.bottom - bar.rect.top
+        if vert_dist < 0:
+            dist 
+            dist *= (np.log(abs((1/vert_dist)))+7)
+        print(dist)
+        return bounce * 1000 + dist
 
     def draw(self, screen):
         pygame.draw.circle(screen, (255, 255, 255), (self.rect.centerx, self.rect.centery), 5)

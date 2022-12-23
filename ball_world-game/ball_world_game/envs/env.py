@@ -28,9 +28,9 @@ except:
 
 
 class CustomEnv(gym.Env):
-    metadata = { "render_fps": 120, "render_modes":['human', 'rgb_array']}
+    metadata = { "render_fps": 120}
     
-    def __init__(self, render_mode='True', mode='AI'):
+    def __init__(self, render_mode=None):
         super().__init__()
         self.action_space = gym.spaces.Discrete(3)           #left, right, stay
         max_speed = 20
@@ -73,7 +73,6 @@ class CustomEnv(gym.Env):
         self.clock = None
         self.screen = None
         self.rng = self.np_random
-        self.mode = mode
 
         pygame.font.init()
         self.font_small = pygame.font.Font("ball_world-game/ball_world_game/envs/breakout_font.ttf",20)
@@ -90,10 +89,10 @@ class CustomEnv(gym.Env):
     def render(self):
         
         #to avoid windows not reponds
-        if self.mode == 'AI':
+        if self.render_mode == 'train' or self.render_mode == 'test':
             pygame.event.get()
 
-        if self.clock is None and self.render_mode == 'True':
+        if self.clock is None and self.render_mode != 'train':
             self.clock = pygame.time.Clock()
 
         self.screen.fill((0, 0, 0))
@@ -105,15 +104,15 @@ class CustomEnv(gym.Env):
             brake.draw(self.screen)
 
         ### Show time and the speed
-        if self.render_mode == 'True':
+        if self.render_mode != 'train':
             self.speed_show = self.font_small.render('Speed: ' + '{:.2f}'.format(np.sqrt(self.ball.speed[0]**2 + self.ball.speed[1]**2)), True, (255,150,0))
             self.screen.blit(self.speed_show, (10,10))
             cur_time = pygame.time.get_ticks()
             survived_time = (cur_time - self.start_time) / 1000
-            sur_time_message = test.font_small.render('Survived time: '+ "{:.1f}".format(survived_time) + 's', True, (255,150,0))
+            sur_time_message = self.font_small.render('Survived time: '+ "{:.1f}".format(survived_time) + 's', True, (255,150,0))
             self.screen.blit(sur_time_message, (150,10))
 
-        if self.render_mode == 'True' and self.terminated != True:
+        if self.render_mode != 'train' and self.terminated != True:
             pygame.display.update()
             self.clock.tick(CustomEnv.metadata['render_fps'])
             pygame.display.flip()
@@ -168,18 +167,18 @@ class CustomEnv(gym.Env):
 
         self.terminated = (not self.ball.survive) or self.ball.win
         reward = dist if not self.terminated else -100000
-        reward += hit_brake * 50000
+        reward += hit_brake * 2000
         if self.ball.win == True:
             reward += 1000000 
         if self.previous_obs_collision != -1:
-            reward -= 2000
+            reward -= 500
         observation = self.get_state()
         info = self._get_info()
 
-        if self.render_mode == 'True':
+        if self.render_mode != 'train':
             self.render()
         #print(observation.shape)
-        if self.terminated ==True and self.mode != 'AI':
+        if self.terminated ==True and self.render_mode == 'human':
             self.end_page()
         
         return observation, reward, self.terminated, info
@@ -194,16 +193,19 @@ class CustomEnv(gym.Env):
         # generate screen
         if self.screen == None:
             pygame.init()
-            if self.render_mode == 'True':
+            if self.render_mode == 'test' or self.render_mode == 'human':
                 pygame.display.init()
-                display_flag = pygame.SHOWN if self.render_mode else pygame.HIDDEN
+                # need further verify the render mode correct or not
+                display_flag = pygame.SHOWN if self.render_mode != 'train' else pygame.HIDDEN
                 self.screen = pygame.display.set_mode([self.SCREEN_WIDTH, self.SCREEN_HEIGHT], flags=display_flag)
             else:
                 self.screen = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
         #start_page
-        if self.mode != 'AI':
+        if self.render_mode == 'human':
             self.start_page()
+        else:
+            self.start_time = pygame.time.get_ticks()
 
         # Need to further check self. 
         self.ball = Ball.Ball(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.screen, self.rng)
@@ -233,13 +235,13 @@ class CustomEnv(gym.Env):
                         if event.key == K_SPACE:
                             start = True
             
-            start_game_message_1 = test.font_small.render('Welcome to ', True, (255,255,0))
+            start_game_message_1 = self.font_small.render('Welcome to ', True, (255,255,0))
             self.screen.blit(start_game_message_1, (150,300))
 
-            start_game_message_2 = test.font_large.render('BreakDown ', True, (255,255,255))
+            start_game_message_2 = self.font_large.render('BreakDown ', True, (255,255,255))
             self.screen.blit(start_game_message_2, (120,350))
 
-            start_game_message_3 = test.font_small.render('Press SPACEBAR to start', True, (255,255,0))
+            start_game_message_3 = self.font_small.render('Press SPACEBAR to start', True, (255,255,0))
             self.screen.blit(start_game_message_3, (90,430))
             pygame.display.update()
             pygame.display.flip()
@@ -251,15 +253,15 @@ class CustomEnv(gym.Env):
         total_time = (self.end_time - self.start_time) / 1000
         self.ball.speed = [0,0]
         self.screen.fill((0,0,0))
-        end_game_message_time = test.font_small.render('Survived time: '+ "{:.1f}".format(total_time) + 's', True, (255,255,255))
+        end_game_message_time = self.font_small.render('Survived time: '+ "{:.1f}".format(total_time) + 's', True, (255,255,255))
         self.screen.blit(end_game_message_time, (140,410))
         if self.ball.win == True:
             end_win = "You Win! :)"
         else:
             end_win = "You Lose! :("
-        end_game_message_1 = test.font_large.render(end_win, True, (255,255,0))
+        end_game_message_1 = self.font_large.render(end_win, True, (255,255,0))
         self.screen.blit(end_game_message_1, (130,350))
-        end_game_message_2 = test.font_small.render('Press ESC to leave the game', True, (255,255,0))
+        end_game_message_2 = self.font_small.render('Press ESC to leave the game', True, (255,255,0))
         self.screen.blit(end_game_message_2, (70,450))
         pygame.display.update()
         self.clock.tick(CustomEnv.metadata['render_fps'])
@@ -277,7 +279,7 @@ class CustomEnv(gym.Env):
 ######### Test code ########
 if __name__ == '__main__':
     #print("HI")
-    test = CustomEnv(mode='human')
+    test = CustomEnv(render_mode='human')
     running = True
 
     test.reset()

@@ -24,7 +24,7 @@ parser.add_argument('--fps', type=int, default=-1)
 # May modify mode for easier testing
 parser.add_argument('--mode', type=str, choices=['human', 'human_rand', 'np_array'], default='human')
 # Mat modify stage for training and testing
-parser.add_argument('--phase', type=str, choices=['train', 'test', 'visual'], default='train')
+parser.add_argument('--phase', type=str, choices=['train', 'test', 'visual'], default='test')
 parser.add_argument('--load_path', type=str, default='')
 arg = parser.parse_args()
 
@@ -106,8 +106,8 @@ def dqn_agent(env):
 
 if __name__ == '__main__':
 
-    env = gym.make('ball_world_game/env_main-v0', render_mode = 'False')
-    env_visual = gym.make('ball_world_game/env_main-v0', render_mode= 'True')
+    env = gym.make('ball_world_game/env_main-v0', render_mode = 'train')
+    env_visual = gym.make('ball_world_game/env_main-v0', render_mode= 'test')
     # env = gym.wrappers.TimeLimit(env, max_episode_steps=arg.max_steps)
 
     if arg.fps > 0:
@@ -128,7 +128,7 @@ if __name__ == '__main__':
         env.close()
     elif arg.phase == 'test':
         dqn.load_weights('dqn_weight.h5f')
-        scores = dqn.test(env_visual, nb_episodes=2)
+        scores = dqn.test(env_visual, nb_episodes=2, visualize =False)
         env.close()
         print(np.mean(scores.history['episode_reward']))
     elif arg.phase == 'visual':
