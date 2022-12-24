@@ -17,6 +17,7 @@ class Ball(pygame.sprite.Sprite):
         self.rect = pygame.draw.circle(screen, (255, 255, 255), (self.x_cor, self.y_cor), 5)
         self.survive = True
         self.win = False
+        self.too_fast = False
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
         init_speed_x = rng.uniform(-1,1)
@@ -76,6 +77,7 @@ class Ball(pygame.sprite.Sprite):
         self.total_speed = np.sqrt(self.speed[0]**2 + self.speed[1]**2)
         if self.total_speed >= 8:
             self.survive = False
+            self.too_fast = True
         if self.total_speed <= 1 and self.total_speed > 0:
             self.win = True
         #self.rect.move_ip(*self.speed)
@@ -89,7 +91,7 @@ class Ball(pygame.sprite.Sprite):
         if vert_dist < 0:
             dist 
             dist *= (np.log(abs((1/vert_dist)))+7)
-        print(dist)
+        #print(dist)
         return bounce * 1000 + dist
 
     def draw(self, screen):

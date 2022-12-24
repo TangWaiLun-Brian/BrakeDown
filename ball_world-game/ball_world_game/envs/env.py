@@ -39,7 +39,7 @@ class CustomEnv(gym.Env):
 
         self.num_of_obs = 5
         self.num_of_br = 5
-        self.num_of_mv_br = 10
+        self.num_of_mv_br = 1
 
         speed_lower_bound = np.array([-max_speed, -max_speed, 0, 0]).reshape(1, 4)
         speed_upper_bound = np.array([max_speed, max_speed, 0, 0]).reshape(1, 4)
@@ -278,15 +278,22 @@ class CustomEnv(gym.Env):
         self.ball.speed = [0,0]
         self.screen.fill((0,0,0))
         end_game_message_time = self.font_small.render('Survived time: '+ "{:.1f}".format(total_time) + 's', True, (255,255,255))
-        self.screen.blit(end_game_message_time, (140,410))
+        self.screen.blit(end_game_message_time, (130,450))
         if self.ball.win == True:
             end_win = "You Win! :)"
+            end_win_2 = "The ball slows down!"
         else:
             end_win = "You Lose! :("
+            if self.ball.too_fast == True:
+                end_win_2 = "The ball is too fast!"
+            else:
+                end_win_2 = "The ball escaped! Bye!"
         end_game_message_1 = self.font_large.render(end_win, True, (255,255,0))
-        self.screen.blit(end_game_message_1, (130,350))
-        end_game_message_2 = self.font_small.render('Press ESC to leave the game', True, (255,255,0))
-        self.screen.blit(end_game_message_2, (70,450))
+        self.screen.blit(end_game_message_1, (125,350))
+        end_game_message_2 = self.font_small.render(end_win_2, True, (255,255,255))
+        self.screen.blit(end_game_message_2, (120,410))
+        end_game_message_3 = self.font_small.render('Press ESC to leave the game', True, (255,255,0))
+        self.screen.blit(end_game_message_3, (75,490))
         pygame.display.update()
         self.clock.tick(CustomEnv.metadata['render_fps'])
         pygame.display.flip()
