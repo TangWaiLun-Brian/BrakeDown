@@ -87,7 +87,10 @@ class CustomEnv(gym.Env):
         #Sound
         pygame.mixer.init()
         self.end_play = False
-        
+
+        self.sound_hit_obs = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Hit_Obstacle.mp3')
+        self.sound_hit_brake = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Hit_Brake.mp3')
+        self.sound_hit_acc = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Hit_Accelerator.mp3')
         
 
     def _get_info(self):
@@ -169,7 +172,7 @@ class CustomEnv(gym.Env):
         dist = self.ball.update(self.bar)
         hit_brake = 0
         for br in self.brake:
-            if br.update(self.ball,self.rng):
+            if br.update(self.ball,self.rng, self.sound_hit_brake):
                 new_brake = Rectangle.Brake(self.SCREEN_WIDTH, self.rng)
                 while pygame.sprite.spritecollide(new_brake, self.obstacles, False) or pygame.sprite.spritecollide(new_brake, self.brake, False):
                     new_brake = Rectangle.Brake(self.SCREEN_WIDTH, self.rng)
@@ -177,7 +180,7 @@ class CustomEnv(gym.Env):
                 hit_brake += 1
 
         for br in self.moving_brake:
-            if br.update(self.ball,self.rng):
+            if br.update(self.ball,self.rng, self.sound_hit_acc):
                 new_brake = Rectangle.MovingBrake(self.SCREEN_WIDTH, self.rng)
                 while pygame.sprite.spritecollide(new_brake, self.obstacles, False) or pygame.sprite.spritecollide(new_brake, self.moving_brake, False):
                     new_brake = Rectangle.MovingBrake(self.SCREEN_WIDTH, self.rng)
@@ -185,7 +188,8 @@ class CustomEnv(gym.Env):
                 hit_brake -= 5
 
         self.previous_obs_collision = Collision.ball_collide_with_obstacles(self.ball, self.obstacles, self.previous_obs_collision, self.rng)
-
+        if self.previous_obs_collision != -1:
+            self.sound_hit_obs.play()
 
         self.terminated = (not self.ball.survive) or self.ball.win
         reward = dist if not self.terminated else -100000

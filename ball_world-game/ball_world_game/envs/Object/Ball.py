@@ -29,9 +29,7 @@ class Ball(pygame.sprite.Sprite):
         #self.speed = [9, 9]
 
         #Sound
-        self.sound_hit_obs = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Hit_Obstacle.mp3')
-        self.sound_hit_brake = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Hit_Brake.mp3')
-        self.sound_hit_acc = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Hit_Accelerator.mp3')
+        
 
 
     def update(self,  bar):

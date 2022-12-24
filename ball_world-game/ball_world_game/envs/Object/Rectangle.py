@@ -53,8 +53,9 @@ class Brake(Rectangle):
         centery = rng.integers(height//2, 390 - height // 2)
         super(Brake, self).__init__((centerx, centery), width, height, color=(140,200,70))
     
-    def update(self, ball, rng):
+    def update(self, ball, rng, sound_hit_brake):
         if self.rect.colliderect(ball):
+            sound_hit_brake.play()
             #print(ball.speed)    
             ball.speed[0] *= 0.8 
             ball.speed[1] *= 0.8
@@ -78,7 +79,7 @@ class MovingBrake(Rectangle):
         # init_speed_x = 0.5
         init_speed_y = np.sqrt(9 - init_speed_x ** 2)
         self.speed = [init_speed_x, init_speed_y]
-    def update(self, ball, rng):
+    def update(self, ball, rng, sound_hit_acc):
         self.x_cor_float += self.speed[0]
         self.y_cor_float += self.speed[1]
         self.rect.centerx = int(self.x_cor_float)
@@ -97,6 +98,7 @@ class MovingBrake(Rectangle):
             # print(ball.speed)
             ball.speed[0] *= 1.5
             ball.speed[1] *= 1.5
+            sound_hit_acc.play()
             # print(ball.speed)
             self.kill()
             return 1
