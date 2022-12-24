@@ -22,14 +22,15 @@ class Ball(pygame.sprite.Sprite):
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
         init_speed_x = rng.uniform(-1,1)
         #init_speed_x = 0.5
-        init_speed_y = np.sqrt(9 - init_speed_x**2)
+        init_speed_y = np.sqrt(6**2 - init_speed_x**2)
         self.speed = [init_speed_x, init_speed_y]
 
+        self.count = 0
         #for testing
         #self.speed = [9, 9]
 
         #Sound
-        
+
 
 
     def update(self,  bar, sound_hit_bar):
@@ -59,7 +60,9 @@ class Ball(pygame.sprite.Sprite):
             bounce = 1
             #self.speed[0] += random.uniform(-2,2)
             self.speed[1] *= -1"""
-            sound_hit_bar.play()
+            bounce = 1
+            if sound_hit_bar is not None:
+                sound_hit_bar.play()
             sign = 1 if self.rect.centerx - bar.rect.centerx > 0 else -1
             self.init_total_speed_squa = self.speed[0]**2 + self.speed[1]**2
             #self.dis_with_center = self.rect.centerx - bar.rect.centerx if abs(self.rect.centerx - bar.rect.centerx) > 3 else (abs(self.rect.centerx - bar.rect.centerx) / (self.rect.centerx - bar.rect.centerx)) * 3
@@ -80,24 +83,28 @@ class Ball(pygame.sprite.Sprite):
         self.rect.centerx = int(self.x_cor_float)
         self.rect.centery = int(self.y_cor_float)
         self.total_speed = np.sqrt(self.speed[0]**2 + self.speed[1]**2)
-        if self.total_speed >= 8:
+        if self.total_speed >= 15:
             self.survive = False
             self.too_fast = True
-        if self.total_speed <= 1 and self.total_speed > 0:
+
+        if self.total_speed <= 2 and self.total_speed > 0:
+            self.win = True
+        elif self.count >= 5:
             self.win = True
         #self.rect.move_ip(*self.speed)
-        if self.rect.centerx - bar.rect.left < 0:
-            dist = self.rect.centerx - bar.rect.left
-        elif self.rect.centerx - bar.rect.right > 0:
-            dist = bar.rect.right - self.rect.centerx
-        else:
-            dist = int(((bar.rect.right-bar.rect.left) / 2 - abs(bar.rect.centerx - self.rect.centerx))  * 0.25 )
-        vert_dist = self.rect.bottom - bar.rect.top
-        if vert_dist < 0:
-            dist 
-            dist *= (np.log(abs((1/vert_dist)))+7)
-        #print(dist)
-        return bounce * 1000 + dist
+        # if self.rect.centerx - bar.rect.left < 0:
+        #     dist = self.rect.centerx - bar.rect.left
+        # elif self.rect.centerx - bar.rect.right > 0:
+        #     dist = bar.rect.right - self.rect.centerx
+        # else:
+        #     dist = int(((bar.rect.right-bar.rect.left) / 2 - abs(bar.rect.centerx - self.rect.centerx))  * 0.25 )
+        # vert_dist = self.rect.bottom - bar.rect.top
+        # if vert_dist < 0:
+        #     dist
+        #     dist *= (np.log(abs((1/vert_dist)))+7)
+        # #print(dist)
+        dist = self.SCREEN_WIDTH - abs(self.rect.centerx - bar.rect.centerx)
+        return bounce * 10000 + dist    #2000
 
     def draw(self, screen):
         pygame.draw.circle(screen, (255, 255, 255), (self.rect.centerx, self.rect.centery), 5)

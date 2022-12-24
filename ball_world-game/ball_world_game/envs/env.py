@@ -21,10 +21,10 @@ try:
 except: 
     None
 
-# try:
-#     from ball_world_game.envs.Object import Ball, Rectangle, Collision
-# except:
-#     None
+try:
+    from ball_world_game.envs.Object import Ball, Rectangle, Collision
+except:
+    None
 
 
 class CustomEnv(gym.Env):
@@ -37,7 +37,7 @@ class CustomEnv(gym.Env):
         upper_bound = []
         lower_bound = []
 
-        self.num_of_obs = 5
+        self.num_of_obs = 10
         self.num_of_br = 5
         self.num_of_mv_br = 1
 
@@ -92,7 +92,11 @@ class CustomEnv(gym.Env):
         self.sound_hit_brake = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Hit_Brake.mp3')
         self.sound_hit_acc = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Hit_Accelerator.mp3')
         self.sound_hit_bar = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/sound_hit_bar.wav')
-        
+
+        # self.sound_hit_obs = None
+        # self.sound_hit_brake = None
+        # self.sound_hit_acc = None
+        # self.sound_hit_bar = None
 
     def _get_info(self):
         return {"relative pos": ((np.array(self.ball.rect.center) - np.array(self.bar.rect.center))**2).sum(),
@@ -179,6 +183,7 @@ class CustomEnv(gym.Env):
                     new_brake = Rectangle.Brake(self.SCREEN_WIDTH, self.rng)
                 self.brake.add(new_brake)
                 hit_brake += 1
+                self.ball.count += 1
 
         for br in self.moving_brake:
             if br.update(self.ball,self.rng, self.sound_hit_acc):
@@ -186,19 +191,20 @@ class CustomEnv(gym.Env):
                 while pygame.sprite.spritecollide(new_brake, self.obstacles, False) or pygame.sprite.spritecollide(new_brake, self.moving_brake, False):
                     new_brake = Rectangle.MovingBrake(self.SCREEN_WIDTH, self.rng)
                 self.moving_brake.add(new_brake)
-                hit_brake -= 5
+                self.ball.count = max(0, self.ball.count-1)
+                hit_brake -= 10
 
         self.previous_obs_collision = Collision.ball_collide_with_obstacles(self.ball, self.obstacles, self.previous_obs_collision, self.rng)
-        if self.previous_obs_collision != -1:
+        if self.previous_obs_collision != -1 and self.sound_hit_bar is not None:
             self.sound_hit_obs.play()
 
         self.terminated = (not self.ball.survive) or self.ball.win
-        reward = dist if not self.terminated else -100000
+        reward = dist if self.ball.survive else -10000000
         reward += hit_brake * 2000
         if self.ball.win == True:
-            reward += 1000000 
-        if self.previous_obs_collision != -1:
-            reward -= 500
+            reward += 10000000
+        # if self.previous_obs_collision != -1:
+        #     reward -= 500
         observation = self.get_state()
         info = self._get_info()
 
