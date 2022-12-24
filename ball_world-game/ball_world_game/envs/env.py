@@ -91,6 +91,7 @@ class CustomEnv(gym.Env):
         self.sound_hit_obs = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Hit_Obstacle.mp3')
         self.sound_hit_brake = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Hit_Brake.mp3')
         self.sound_hit_acc = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Hit_Accelerator.mp3')
+        self.sound_hit_bar = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/sound_hit_bar.wav')
         
 
     def _get_info(self):
@@ -169,7 +170,7 @@ class CustomEnv(gym.Env):
     
     def step(self, action):
         self.bar.update(action)
-        dist = self.ball.update(self.bar)
+        dist = self.ball.update(self.bar, self.sound_hit_bar)
         hit_brake = 0
         for br in self.brake:
             if br.update(self.ball,self.rng, self.sound_hit_brake):

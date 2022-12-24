@@ -32,7 +32,7 @@ class Ball(pygame.sprite.Sprite):
         
 
 
-    def update(self,  bar):
+    def update(self,  bar, sound_hit_bar):
         """x = self.x_cor + self.speed[0]
         y = self.y_cor + self.speed[1]
         pygame.draw.circle(screen, (255, 255, 255), (x,y), 5)"""
@@ -59,6 +59,7 @@ class Ball(pygame.sprite.Sprite):
             bounce = 1
             #self.speed[0] += random.uniform(-2,2)
             self.speed[1] *= -1"""
+            sound_hit_bar.play()
             sign = 1 if self.rect.centerx - bar.rect.centerx > 0 else -1
             self.init_total_speed_squa = self.speed[0]**2 + self.speed[1]**2
             #self.dis_with_center = self.rect.centerx - bar.rect.centerx if abs(self.rect.centerx - bar.rect.centerx) > 3 else (abs(self.rect.centerx - bar.rect.centerx) / (self.rect.centerx - bar.rect.centerx)) * 3
