@@ -26,7 +26,7 @@ class Ball(pygame.sprite.Sprite):
         self.speed = [init_speed_x, init_speed_y]
 
         #for testing
-        #self.speed = [0.3, 0.3]
+        #self.speed = [9, 9]
 
         #Sound
         self.sound_hit_obs = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Hit_Obstacle.mp3')

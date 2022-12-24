@@ -86,6 +86,7 @@ class CustomEnv(gym.Env):
 
         #Sound
         pygame.mixer.init()
+        self.end_play = False
         
         
 
@@ -284,6 +285,9 @@ class CustomEnv(gym.Env):
 
     def end_page(self):
         self.main_bg_sound.stop()
+        if self.end_play == False:
+            self.win_bf_sound = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/win.wav')
+            self.lose_bf_sound = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/lose.wav')
         if self.end_time == None:
             self.end_time = pygame.time.get_ticks()
         total_time = (self.end_time - self.start_time) / 1000
@@ -292,14 +296,19 @@ class CustomEnv(gym.Env):
         end_game_message_time = self.font_small.render('Survived time: '+ "{:.1f}".format(total_time) + 's', True, (255,255,255))
         self.screen.blit(end_game_message_time, (130,450))
         if self.ball.win == True:
+            if self.end_play == False:
+                self.win_bf_sound.play()
             end_win = "You Win! :)"
             end_win_2 = "The ball slows down!"
         else:
+            if self.end_play == False:
+                self.lose_bf_sound.play()
             end_win = "You Lose! :("
             if self.ball.too_fast == True:
                 end_win_2 = "The ball is too fast!"
             else:
                 end_win_2 = "The ball escaped! Bye!"
+        self.end_play = True
         end_game_message_1 = self.font_large.render(end_win, True, (255,255,0))
         self.screen.blit(end_game_message_1, (125,350))
         end_game_message_2 = self.font_small.render(end_win_2, True, (255,255,255))
