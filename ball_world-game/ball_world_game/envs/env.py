@@ -84,6 +84,11 @@ class CustomEnv(gym.Env):
         self.mex_speed = 10
 
 
+        #Sound
+        pygame.mixer.init()
+        
+        
+
     def _get_info(self):
         return {"relative pos": ((np.array(self.ball.rect.center) - np.array(self.bar.rect.center))**2).sum(),
                 }
@@ -252,6 +257,8 @@ class CustomEnv(gym.Env):
         return state  #ball, bar and obstaicles cooridnate
 
     def start_page(self):
+        self.start_bg_sound = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Starting_page.mp3')
+        self.start_bg_sound.play(-1)
         start = False
         while not start:
             for event in pygame.event.get():
@@ -270,8 +277,13 @@ class CustomEnv(gym.Env):
             pygame.display.update()
             pygame.display.flip()
         self.start_time = pygame.time.get_ticks()
+        self.start_bg_sound.stop()
+        self.main_bg_sound = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Main_game.mp3')
+        self.main_bg_sound.play(-1)
+
 
     def end_page(self):
+        self.main_bg_sound.stop()
         if self.end_time == None:
             self.end_time = pygame.time.get_ticks()
         total_time = (self.end_time - self.start_time) / 1000
