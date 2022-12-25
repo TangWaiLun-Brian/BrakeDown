@@ -104,7 +104,7 @@ class Ball(pygame.sprite.Sprite):
         #     dist *= (np.log(abs((1/vert_dist)))+7)
         # #print(dist)
         dist = self.SCREEN_WIDTH - abs(self.rect.centerx - bar.rect.centerx)
-        return bounce * 10000 + dist    #2000
+        return bounce * 0 + dist    #2000
 
     def draw(self, screen):
         pygame.draw.circle(screen, (255, 255, 255), (self.rect.centerx, self.rect.centery), 5)

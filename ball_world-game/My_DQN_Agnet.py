@@ -64,8 +64,34 @@ class ReplayMemory():
     def can_provide_sample(self, batch_size):
         return len(self.memory) >= batch_size
 
+def test():
+    model = build_model(env.observation_space.sample().shape[0], env.action_space.n)
+    model.load_weights('my_dqn_weight.h5')
+    collect_list = []
+    reward_list = []
+    success_list = []
+    for i in range(10):
+        total_testing_reward = 0
+        observation = env.reset(seed=np.random.randint(0, 500000))
+        render = True
+        done = False
+        while not done:
+            if render:
+                env.render()
+            predicted = model.predict(observation.reshape(1, -1)).reshape(-1)
+            action = np.argmax(predicted)
+            new_observation, reward, done, info = env.step(action)
+
+            total_testing_reward += reward
+            observation = new_observation
+        print(f'testing reward: {total_testing_reward: 5} collected brakes: {env.ball.count}')
+        collect_list.append(env.ball.count)
+        reward_list.append(total_testing_reward)
+        success_list.append(env.ball.count >= 5)
+    print(f'Success Rate: {sum(success_list) / len(success_list): 5} Average Reward: {sum(reward_list) / len(reward_list): 6} Average Collect: {sum(collect_list) / len(collect_list)}')
+
 def main():
-    max_episodes = 300
+    max_episodes = 500
     epsilon = 1  # Epsilon-greedy algorithm in initialized at 1 meaning every step is random at the start
     max_epsilon = 1  # You can't explore more than 100% of the time
     min_epsilon = 0.01  # At a minimum, we'll always explore 1% of the time
@@ -127,5 +153,5 @@ def main():
     print('Finish Training. Saving Model...')
     target_model.save_weights('my_dqn_weight.h5', overwrite=True)
 if __name__ == '__main__':
-    main()
+    test()
 
