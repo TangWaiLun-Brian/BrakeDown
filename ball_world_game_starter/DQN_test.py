@@ -19,8 +19,6 @@ def test(env):
         render = True
         done = False
         while not done:
-            # if render:
-            #     env.render()
             predicted = model.predict(observation.reshape(1, -1)).reshape(-1)
             action = np.argmax(predicted)
             new_observation, reward, done, info = env.step(action)
@@ -36,6 +34,6 @@ def test(env):
 
 
 if __name__ == '__main__':
-    env = gym.make('ball_world_game/env_main-v0', render_mode=args.mode, num_of_obs=args.num_of_obs,
+    env = gym.make('ball_world_game/env_main-v0', render_mode='train', num_of_obs=args.num_of_obs,
                    num_of_br=args.num_of_br, num_of_acc=args.num_of_acc, ball_initial_speed=args.ball_initial_speed)
     test(env)

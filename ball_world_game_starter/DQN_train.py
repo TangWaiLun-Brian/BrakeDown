@@ -130,7 +130,9 @@ def main(env):
     # plot graphs
     fig1 = plt.figure()
     ax1 = fig1.add_subplot(1, 1, 1)
-    ax1.plot(episode_list, reward_list)
+    window_size = 15
+    reward_sma = [sum(reward_list[i:i+window_size]) / window_size for i in range(0, len(reward_list)-window_size+1)]
+    ax1.plot(np.arange(len(reward_sma)), reward_sma)
     ax1.set_title('Total Reward over Episodes')
 
     fig1.savefig('./experimental results/Reward_Graph.png')
