@@ -3,24 +3,20 @@ import gym
 import numpy as np
 import random
 import ball_world_game
-
-env = gym.make('ball_world_game/env_main-v0', render_mode='test')
-env_visual = gym.make('ball_world_game/env_main-v0', render_mode='test')
-model = build_model(env.observation_space.sample().shape[0], env.action_space.n)
+import matplotlib.pyplot as plt
+from Training_config import args
 
 
 def train(env, replay_memory, model, target_model, done):
-    learning_rate = 0.7
-    discount_factor = 0.62
+    learning_rate = args.learning_rate
+    discount_factor = args.discount_factor
     MIN_REPLAY_SIZE = 1000
-    batch_size = 64
+    batch_size = args.batch_size
 
     if not replay_memory.can_provide_sample(MIN_REPLAY_SIZE):
         return
 
-    #index = np.random.choice(replay_memory.shape[0], batch_size, replace=False)
     mini_batch = replay_memory.sample(batch_size)
-    #mini_batch = random.sample(replay_memory, batch_size)
     current_states = np.array([transition[0] for transition in mini_batch])
     current_qs_list = model.predict(current_states)
     new_current_states = np.array([transition[3] for transition in mini_batch])
@@ -64,38 +60,15 @@ class ReplayMemory():
     def can_provide_sample(self, batch_size):
         return len(self.memory) >= batch_size
 
-def test():
-    model = build_model(env.observation_space.sample().shape[0], env.action_space.n)
-    model.load_weights('my_dqn_weight.h5')
-    collect_list = []
-    reward_list = []
-    success_list = []
-    for i in range(10):
-        total_testing_reward = 0
-        observation = env.reset(seed=np.random.randint(0, 500000))
-        render = True
-        done = False
-        while not done:
-            if render:
-                env.render()
-            predicted = model.predict(observation.reshape(1, -1)).reshape(-1)
-            action = np.argmax(predicted)
-            new_observation, reward, done, info = env.step(action)
 
-            total_testing_reward += reward
-            observation = new_observation
-        print(f'testing reward: {total_testing_reward: 5} collected brakes: {env.ball.count}')
-        collect_list.append(env.ball.count)
-        reward_list.append(total_testing_reward)
-        success_list.append(env.ball.count >= 5)
-    print(f'Success Rate: {sum(success_list) / len(success_list): 5} Average Reward: {sum(reward_list) / len(reward_list): 6} Average Collect: {sum(collect_list) / len(collect_list)}')
+def main(env):
+    max_episodes = args.episode
 
-def main():
-    max_episodes = 500
-    epsilon = 1  # Epsilon-greedy algorithm in initialized at 1 meaning every step is random at the start
-    max_epsilon = 1  # You can't explore more than 100% of the time
-    min_epsilon = 0.01  # At a minimum, we'll always explore 1% of the time
-    decay = 0.01
+    max_epsilon = args.max_epsilon  # You can't explore more than 100% of the time
+    min_epsilon = args.min_epsilon  # At a minimum, we'll always explore 1% of the time
+    epsilon = max_epsilon  # Epsilon-greedy algorithm in initialized at 1 meaning every step is random at the start
+
+    decay = args.decay_rate
 
     render = True
     model = build_model(env.observation_space.sample().shape[0], env.action_space.n)
@@ -103,12 +76,10 @@ def main():
     target_model = build_model(env.observation_space.sample().shape[0], env.action_space.n)
     target_model.set_weights(model.get_weights())
 
-    replay_memory = ReplayMemory(50000)
+    replay_memory = ReplayMemory(args.replay_size)
 
-    target_update_counter = 0
-
-    X = []
-    y = []
+    reward_list = []
+    epsilon_list = []
 
     steps = 0
     for episode in range(max_episodes):
@@ -118,8 +89,6 @@ def main():
 
         while not done:
             steps += 1
-            if render:
-                env.render()
 
             rand_num = np.random.rand()
 
@@ -148,10 +117,32 @@ def main():
                     steps = 0
                 break
 
+        reward_list.append(total_training_reward)
+        epsilon_list.append(epsilon)
+
         epsilon = min_epsilon + (max_epsilon - min_epsilon) * np.exp(-decay * episode)
 
     print('Finish Training. Saving Model...')
-    target_model.save_weights('my_dqn_weight.h5', overwrite=True)
+    if args.save_model:
+        target_model.save_weights('my_dqn_weight_2.h5', overwrite=True)
+
+    episode_list = np.arange(max_episodes)
+    # plot graphs
+    fig1 = plt.figure()
+    ax1 = fig1.add_subplot(1, 1, 1)
+    ax1.plot(episode_list, reward_list)
+    ax1.set_title('Total Reward over Episodes')
+
+    fig1.savefig('./experimental results/Reward_Graph.png')
+
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot(1, 1, 1)
+    ax2.plot(episode_list, epsilon_list)
+    ax2.set_title('Epsilon over Episodes')
+    fig2.savefig('./experimental results/Epislon_Graph.png')
+
+
 if __name__ == '__main__':
-    test()
+    env = gym.make('ball_world_game/env_main-v0', render_mode=args.mode, num_of_obs=args.num_of_obs, num_of_br=args.num_of_br, num_of_acc=args.num_of_acc, ball_initial_speed=args.ball_initial_speed)
+    main(env)
 

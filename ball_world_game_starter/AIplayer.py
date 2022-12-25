@@ -13,9 +13,7 @@ from rl.agents import DQNAgent
 from rl.policy import BoltzmannQPolicy
 from rl.memory import SequentialMemory
 
-print(tf.__version__)
-print(Adam)
-print(tf.optimizers.Adam)
+'''
 parser = args.ArgumentParser()
 parser.add_argument('--episode', type=int, default=1)
 parser.add_argument('--max_steps', type=int, default=100000)
@@ -27,7 +25,7 @@ parser.add_argument('--mode', type=str, choices=['human', 'human_rand', 'np_arra
 parser.add_argument('--phase', type=str, choices=['train', 'test', 'visual'], default='test')
 parser.add_argument('--load_path', type=str, default='')
 arg = parser.parse_args()
-
+'''
 
 
 # Random Movement
@@ -98,11 +96,7 @@ def dqn_agent(env):
     model = build_model(states, actions)
 
     return build_agent(model, actions)
-#obs = env.reset()
-#obs2, _, _, _ = env.step(0)
-#print(obs.shape, obs2.shape)
-# dqn = build_agent(model, actions)
-#Adam._name = 'No name'
+
 
 
 if __name__ == '__main__':
