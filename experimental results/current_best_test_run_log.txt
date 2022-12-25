@@ -1,0 +1,27 @@
+testing reward:  11191275 collected brakes: 5
+testing reward:  10733888 collected brakes: 5
+testing reward:  10596910 collected brakes: 5
+testing reward:  11134908 collected brakes: 5
+testing reward:  11212699 collected brakes: 5
+testing reward:  11091506 collected brakes: 5
+testing reward:  12336023 collected brakes: 5
+testing reward:  11796230 collected brakes: 5
+testing reward:  12420983 collected brakes: 5
+testing reward:  11558899 collected brakes: 5
+testing reward:  11976174 collected brakes: 5
+testing reward:  11809822 collected brakes: 6
+testing reward:  11000394 collected brakes: 5
+testing reward:  11236419 collected brakes: 5
+testing reward:  11946444 collected brakes: 5
+testing reward:  11062966 collected brakes: 5
+testing reward:  12073920 collected brakes: 5
+testing reward:  11022190 collected brakes: 5
+testing reward:  11046051 collected brakes: 5
+testing reward:  11486498 collected brakes: 5
+testing reward:  11325844 collected brakes: 5
+testing reward:  11754744 collected brakes: 5
+testing reward:  11124664 collected brakes: 5
+testing reward:  12420694 collected brakes: 5
+testing reward:  11284805 collected brakes: 5
+testing reward:  11095660 collected brakes: 5
+Success Rate:  0.96 Average Reward:  10605115.22 Average Collect: 4.84
