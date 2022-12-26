@@ -14,11 +14,11 @@ class Ball(pygame.sprite.Sprite):
 
         """self.image = pygame.Surface([x_cor, y_cor])
         self.image.fill((0,0,0))"""
-        self.img = pygame.image.load('ball_world-game/ball_world_game/envs/Image/cannon_ball_8.png')
+        self.img = pygame.image.load('ball_world-game/ball_world_game/envs/Image/cannon_ball_10_green.png')
+        self.image = self.img.convert()
         self.rect = self.img.get_rect()
         screen.blit(self.img, (self.x_cor, self.y_cor))
         #self.rect = pygame.draw.circle(screen, (255, 255, 255), (self.x_cor, self.y_cor), 5)
-        print(self.rect)
         self.survive = True
         self.win = False
         self.too_fast = False
@@ -31,7 +31,7 @@ class Ball(pygame.sprite.Sprite):
         self.initial_speed = initial_speed
         self.count = 0
         #for testing
-        #self.speed = [0, 0]
+        self.speed = [0, 0]
 
         #Sound
 
