@@ -2,13 +2,17 @@
 cd AIST1110_Project
 pip install -e .
 ### Usage
-cd ball_world-game
+`cd ball_world-game`
+
 To run as human mode,
 `python ball_world_game_starter/ball_world_game_play.py`
+
 To run as Random Agent,
 `python ball_world_game_starter/ball_world_game_play.py --mode human_rand`
+
 To train Deep Q Agent,
 `python ball_world_game_starter/DQN_train.py`
+
 To test Deep Q Agent,
 `python ball_world_game_starter/DQN_test.py`
 ### Acknowledgement of resource of BrakeDown
