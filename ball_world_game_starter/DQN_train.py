@@ -159,6 +159,6 @@ def main(env):
 
 
 if __name__ == '__main__':
-    env = gym.make('ball_world_game/env_main-v0', render_mode=args.mode, num_of_obs=args.num_of_obs, num_of_br=args.num_of_br, num_of_acc=args.num_of_acc, ball_initial_speed=args.ball_initial_speed)
+    env = gym.make('ball_world_game/env_main-v0', render_mode=args.mode if not args.v else 'test', num_of_obs=args.num_of_obs, num_of_br=args.num_of_br, num_of_acc=args.num_of_acc, ball_initial_speed=args.ball_initial_speed)
     main(env)
 

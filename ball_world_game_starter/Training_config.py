@@ -19,7 +19,8 @@ parser.add_argument('--ball_initial_speed', type=float, default=3.)
 parser.add_argument('--num_of_accelerator', type=int, default=1)
 
 parser.add_argument('--fps', type=int, default=120)
-parser.add_argument('--mode', type=str, choices=['human', 'random', 'train', 'test'], default='train')
+parser.add_argument('--mode', type=str, choices=['train'], default='train')
+parser.add_argument('-v', action='store_true')
 parser.add_argument('--save_model', type=bool, default=True)
 
 args = parser.parse_args()
