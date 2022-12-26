@@ -1,7 +1,10 @@
 ### SetUp Environment
+
 cd AIST1110_Project
 pip install -e .
+
 ### Usage
+
 To run as human mode,
 
 `python ball_world_game_starter/ball_world_game_play.py`
@@ -17,11 +20,16 @@ To train Deep Q Agent,
 To test Deep Q Agent,
 
 `python ball_world_game_starter/DQN_test.py`
+
 ### Acknowledgement of resource of BrakeDown
 
 #### Game idea
 
 Breakout produced by Atari. Game manual url: [https://everything2.com/title/Breakout](https://everything2.com/title/Breakout)
+
+#### Font
+
+Breakout_game font. By Ahmed0Khfagy. Github. url [https://github.com/aKhfagy/breakout-game/blob/master/fonts/font.ttf](https://github.com/aKhfagy/breakout-game/blob/master/fonts/font.ttf)
 
 #### Code
 
