@@ -88,6 +88,8 @@ class CustomEnv(gym.Env):
         self.cul_reward = 0
         self.initial_speed = ball_initial_speed
 
+        self.main_back = pygame.image.load('ball_world-game/ball_world_game/envs/Image/Main_background.jpg')
+
 
         #Sound
         pygame.mixer.init()
@@ -118,6 +120,7 @@ class CustomEnv(gym.Env):
             self.clock = pygame.time.Clock()
 
         self.screen.fill((0, 0, 0))
+        self.screen.blit(self.main_back, (0,0))
         self.ball.draw(self.screen)
         self.bar.draw(self.screen)
         for obstacle in self.obstacles:
@@ -278,6 +281,7 @@ class CustomEnv(gym.Env):
         self.start_bg_sound = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Starting_page.mp3')
         self.start_bg_sound.play(-1)
         start = False
+        self.screen.fill((0, 0, 0))
         while not start:
             for event in pygame.event.get():
                     if event.type == KEYDOWN:
@@ -309,6 +313,7 @@ class CustomEnv(gym.Env):
             self.end_time = pygame.time.get_ticks()
         total_time = (self.end_time - self.start_time) / 1000
         self.ball.speed = [0,0]
+        for acc in self.accelerators: acc.speed = [0,0]
         self.screen.fill((0,0,0))
         end_game_message_time = self.font_small.render('Survived time: '+ "{:.1f}".format(total_time) + 's', True, (255,255,255))
         self.screen.blit(end_game_message_time, (130,450))
