@@ -225,6 +225,8 @@ class CustomEnv(gym.Env):
             self.end_page()
             self.end_play = False
             self.at_end_page = False
+            self.end_time = None
+
         return observation, reward, self.terminated, info
 
 

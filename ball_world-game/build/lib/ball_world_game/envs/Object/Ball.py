@@ -12,16 +12,20 @@ class Ball(pygame.sprite.Sprite):
         self.x_cor_float = self.x_cor
         self.y_cor_float = self.y_cor
 
-        """self.image = pygame.Surface([x_cor, y_cor])
-        self.image.fill((0,0,0))"""
-        self.rect = pygame.draw.circle(screen, (255, 255, 255), (self.x_cor, self.y_cor), 5)
+
+        self.img = pygame.image.load('ball_world-game/ball_world_game/envs/Image/cannon_ball_10_green.png')
+        self.image = self.img.convert()
+        self.rect = self.img.get_rect()
+        screen.blit(self.img, (self.x_cor, self.y_cor))
+
         self.survive = True
         self.win = False
         self.too_fast = False
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
+        # initialize the speed x
         init_speed_x = rng.uniform(-1,1)
-        #init_speed_x = 0.5
+        # Calculate speed y with respect to speed x
         init_speed_y = np.sqrt(initial_speed**2 - init_speed_x**2)
         self.speed = [init_speed_x, init_speed_y]
         self.initial_speed = initial_speed
@@ -29,17 +33,12 @@ class Ball(pygame.sprite.Sprite):
         #for testing
         #self.speed = [0, 0]
 
-        #Sound
 
 
 
     def update(self,  bar, sound_hit_bar):
-        """x = self.x_cor + self.speed[0]
-        y = self.y_cor + self.speed[1]
-        pygame.draw.circle(screen, (255, 255, 255), (x,y), 5)"""
-        
 
-        #collision with boundary
+        # collision with boundary
         if self.rect.left < 0 and self.speed[0] <= 0:
             self.speed[0] *= -1
         elif self.rect.right > self.SCREEN_WIDTH and self.speed[0] >= 0:
@@ -48,36 +47,23 @@ class Ball(pygame.sprite.Sprite):
             self.speed[1] *= -1
         elif self.rect.bottom >= self.SCREEN_HEIGHT:
             self.survive = False
-
+        # bounce is used to record if the ball collides with bar (for reward part)
         bounce = 0
-        #collision with bar
+        # collision with bar
         if self.rect.bottom >= bar.rect.top and self.rect.top <= bar.rect.bottom and self.rect.centerx >= bar.rect.left and self.rect.centerx <= bar.rect.right:
-            """if self.speed[0]**2 + self.speed[1]**2 < 20**2:
-                self.speed[1] += 0.01
-                sign = 1 if self.speed[0] >= 0 else -1
-                self.speed[0] += sign * 0.01
-
-            bounce = 1
-            #self.speed[0] += random.uniform(-2,2)
-            self.speed[1] *= -1"""
             bounce = 1
             if sound_hit_bar is not None:
                 sound_hit_bar.play()
             sign = 1 if self.rect.centerx - bar.rect.centerx > 0 else -1
             self.init_total_speed_squa = self.speed[0]**2 + self.speed[1]**2
             #self.dis_with_center = self.rect.centerx - bar.rect.centerx if abs(self.rect.centerx - bar.rect.centerx) > 3 else (abs(self.rect.centerx - bar.rect.centerx) / (self.rect.centerx - bar.rect.centerx)) * 3
+            # Calculate the rebound angle according to the contact point
             self.rebounce_angle = ((self.rect.centerx - bar.rect.centerx + (sign * 3)) / (bar.rect.right-bar.rect.left) + (sign * 3))* np.pi /1.5
             self.speed[0] = np.sqrt(self.init_total_speed_squa) * np.sin(self.rebounce_angle)
             self.speed[1] = np.sqrt(self.init_total_speed_squa) * np.cos(self.rebounce_angle) * -1
             
-            #print(self.rebounce_angle, self.speed)
 
-
-
-
-
-
-        #print(self.speed)
+        # adjust the speed
         self.x_cor_float += self.speed[0]
         self.y_cor_float += self.speed[1]
         self.rect.centerx = int(self.x_cor_float)
@@ -107,4 +93,5 @@ class Ball(pygame.sprite.Sprite):
         return bounce * 0 + dist    #2000
 
     def draw(self, screen):
-        pygame.draw.circle(screen, (255, 255, 255), (self.rect.centerx, self.rect.centery), 5)
+        #pygame.draw.circle(screen, (255, 255, 255), (self.rect.centerx, self.rect.centery), 5)
+        screen.blit(self.img, (self.rect.centerx, self.rect.centery))
