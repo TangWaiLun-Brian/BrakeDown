@@ -1,10 +1,11 @@
+from Training_config import args
 from AIplayer import build_model
 import gym
 import numpy as np
 import random
 import ball_world_game
 import matplotlib.pyplot as plt
-from Training_config import args
+
 
 
 def train(replay_memory, model, target_model):

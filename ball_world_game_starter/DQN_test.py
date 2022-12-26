@@ -27,7 +27,7 @@ def test(env):
         done = False
         while not done:
             # model takes a move
-            predicted = model.predict(observation.reshape(1, -1)).reshape(-1)
+            predicted = model.predict(observation.reshape(1, -1), verbose=0).reshape(-1)
             action = np.argmax(predicted)
             new_observation, reward, done, info = env.step(action)
 
