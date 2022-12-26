@@ -94,6 +94,7 @@ class CustomEnv(gym.Env):
         #Sound
         pygame.mixer.init()
         self.end_play = False
+        self.at_end_page = False
 
         if self.render_mode == 'train':
             self.sound_hit_obs = None
@@ -220,7 +221,7 @@ class CustomEnv(gym.Env):
         if self.render_mode != 'train':
             self.render()
         #print(observation.shape)
-        if self.terminated == True and self.render_mode == 'human':
+        if self.terminated == True and self.render_mode == 'human' and self.at_end_page == False:
             self.end_page()
         
         return observation, reward, self.terminated, info
@@ -307,6 +308,7 @@ class CustomEnv(gym.Env):
 
 
     def end_page(self):
+        self.at_end_page = True
         self.main_bg_sound.stop()
         if self.end_play == False:
             self.win_bf_sound = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/win.wav')
