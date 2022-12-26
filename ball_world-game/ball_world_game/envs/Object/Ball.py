@@ -14,7 +14,11 @@ class Ball(pygame.sprite.Sprite):
 
         """self.image = pygame.Surface([x_cor, y_cor])
         self.image.fill((0,0,0))"""
-        self.rect = pygame.draw.circle(screen, (255, 255, 255), (self.x_cor, self.y_cor), 5)
+        self.img = pygame.image.load('ball_world-game/ball_world_game/envs/Image/cannon_ball_8.png')
+        self.rect = self.img.get_rect()
+        screen.blit(self.img, (self.x_cor, self.y_cor))
+        #self.rect = pygame.draw.circle(screen, (255, 255, 255), (self.x_cor, self.y_cor), 5)
+        print(self.rect)
         self.survive = True
         self.win = False
         self.too_fast = False
@@ -27,7 +31,7 @@ class Ball(pygame.sprite.Sprite):
         self.initial_speed = initial_speed
         self.count = 0
         #for testing
-        self.speed = [0, 0]
+        #add self.speed = [0, 0]
 
         #Sound
 
@@ -107,4 +111,5 @@ class Ball(pygame.sprite.Sprite):
         return bounce * 0 + dist    #2000
 
     def draw(self, screen):
-        pygame.draw.circle(screen, (255, 255, 255), (self.rect.centerx, self.rect.centery), 5)
+        #pygame.draw.circle(screen, (255, 255, 255), (self.rect.centerx, self.rect.centery), 5)
+        screen.blit(self.img, (self.rect.centerx, self.rect.centery))
