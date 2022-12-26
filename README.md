@@ -2,8 +2,6 @@
 cd AIST1110_Project
 pip install -e .
 ### Usage
-`cd ball_world-game`
-
 To run as human mode,
 
 `python ball_world_game_starter/ball_world_game_play.py`
