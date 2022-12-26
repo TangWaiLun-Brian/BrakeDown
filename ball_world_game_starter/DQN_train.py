@@ -20,10 +20,10 @@ def train(replay_memory, model, target_model):
     mini_batch = replay_memory.sample(batch_size)
     current_states = np.array([transition[0] for transition in mini_batch])
     # make prediction on current states with main model
-    current_qs_list = model.predict(current_states)
+    current_qs_list = model.predict(current_states,verbose=0)
     new_current_states = np.array([transition[3] for transition in mini_batch])
     # make prediction on next states with target model
-    future_qs_list = target_model.predict(new_current_states)
+    future_qs_list = target_model.predict(new_current_states, verbose=0)
 
     X = []
     Y = []
@@ -107,7 +107,7 @@ def main(env):
             if rand_num <= epsilon:
                 action = env.action_space.sample()
             else:
-                predicted = model.predict(observation.reshape(1, -1)).reshape(-1)
+                predicted = model.predict(observation.reshape(1, -1), verbose=0).reshape(-1)
                 action = np.argmax(predicted)
 
             # Take a move and get the next observation, reward and terminate flag
