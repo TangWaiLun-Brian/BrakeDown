@@ -1,4 +1,5 @@
 ### SetUp Environment
+
 ```
 cd AIST1110_Project
 conda create --name aist1110_project
@@ -7,6 +8,7 @@ cd ball_world-game
 pip install -e .
 cd ..
 ```
+
 ### Usage
 
 To run as human mode,
@@ -57,3 +59,9 @@ minDQN. Github. url:[https://github.com/mswang12/minDQN/blob/main/minDQN.py](htt
 6. Sound effect for hitting brake: Large cork pop . By freesfx. url: [https://freesfx.co.uk/Category/Pop-Bang/253](https://freesfx.co.uk/Category/Pop-Bang/253)
 7. Sound effect for hitting obstacle:  Electric door locks Car Locks. By freesfx. url: [https://freesfx.co.uk/Category/Cars/71](https://freesfx.co.uk/Category/Cars/71)
 8. Sound effect for hitting control bar: Bike notification bell. By mixkit. url: [https://mixkit.co/free-sound-effects/bell/](https://mixkit.co/free-sound-effects/bell/)
+
+#### Image
+
+Background: Stones & Brick Textures. By Pucci-games. url: [https://pucci-games.itch.io/stones-brick-textures](https://pucci-games.itch.io/stones-brick-textures)
+
+Ball: Cannonball. By Dansevenstar. OpenGameArt.org. url: [https://opengameart.org/content/cannonball](https://opengameart.org/content/cannonball)
