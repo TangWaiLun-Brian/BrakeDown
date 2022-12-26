@@ -138,7 +138,7 @@ def main(env):
 
     print('Finish Training. Saving Model...')
     if args.save_model:
-        target_model.save_weights('my_dqn_weight_2.h5', overwrite=True)
+        target_model.save_weights(args.model_name, overwrite=True)
 
     episode_list = np.arange(max_episodes)
     # plot graphs

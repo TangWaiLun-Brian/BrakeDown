@@ -22,5 +22,7 @@ parser.add_argument('--fps', type=int, default=120)
 parser.add_argument('--mode', type=str, choices=['train'], default='train')
 parser.add_argument('-v', action='store_true')
 parser.add_argument('--save_model', type=bool, default=True)
+# Setting to the third model name to avoid over-written the pretrained models
+parser.add_argument('--model_name', type=str, default='my_dqn_weight_3.h5')
 
 args = parser.parse_args()
