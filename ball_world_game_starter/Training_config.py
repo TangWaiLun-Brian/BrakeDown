@@ -1,7 +1,9 @@
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--episode', type=int, default=300)
+parser.add_argument('--episode', type=int, default=200)
 parser.add_argument('--batch_size', type=int, default=64)
+parser.add_argument('--train_step', type=int, default=4)
+parser.add_argument('--update_step', type=int, default=100)
 parser.add_argument('--learning_rate', type=float, default=0.7)
 parser.add_argument('--discount_factor', type=float, default=0.62)
 parser.add_argument('--replay_size', type=int, default=100000)

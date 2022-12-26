@@ -27,7 +27,8 @@ def train(replay_memory, model, target_model):
 
     X = []
     Y = []
-    for index, (observation, action, reward, new_observation, done) in enumerate(mini_batch):
+    for index in range(len(mini_batch)):
+        observation, action, reward, new_observation, done = mini_batch[index]
         if not done:
             # try to maximize future q value with respect to the target model prediction on next state
             max_future_q = reward + discount_factor * np.max(future_qs_list[index])
@@ -79,8 +80,8 @@ def main(env):
 
     decay = args.decay_rate
 
-    train_step = 4
-    update_step = 100
+    train_step = args.train_step
+    update_step = args.update_step
     # Main model
     model = build_model(env.observation_space.sample().shape[0], env.action_space.n)
     # Target model, update every 100 steps
