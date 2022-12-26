@@ -61,37 +61,29 @@ class Ball(pygame.sprite.Sprite):
             self.rebounce_angle = ((self.rect.centerx - bar.rect.centerx + (sign * 3)) / (bar.rect.right-bar.rect.left) + (sign * 3))* np.pi /1.5
             self.speed[0] = np.sqrt(self.init_total_speed_squa) * np.sin(self.rebounce_angle)
             self.speed[1] = np.sqrt(self.init_total_speed_squa) * np.cos(self.rebounce_angle) * -1
-            
 
-        # adjust the speed
+        # adjust the position of ball
+        # use float to record the actual position but display with a discrete one
         self.x_cor_float += self.speed[0]
         self.y_cor_float += self.speed[1]
         self.rect.centerx = int(self.x_cor_float)
         self.rect.centery = int(self.y_cor_float)
+
+        # calculate ball speed and see if it exceeds the upper bound
         self.total_speed = np.sqrt(self.speed[0]**2 + self.speed[1]**2)
         if self.total_speed >= 15:
             self.survive = False
             self.too_fast = True
-
+        # player wins if speed is lower than lower bound
         if self.total_speed < 1 and self.total_speed > 0:
             self.win = True
+        # player also wins if the ball hits brake 5 times
         elif self.count >= 5:
             self.win = True
-        #self.rect.move_ip(*self.speed)
-        # if self.rect.centerx - bar.rect.left < 0:
-        #     dist = self.rect.centerx - bar.rect.left
-        # elif self.rect.centerx - bar.rect.right > 0:
-        #     dist = bar.rect.right - self.rect.centerx
-        # else:
-        #     dist = int(((bar.rect.right-bar.rect.left) / 2 - abs(bar.rect.centerx - self.rect.centerx))  * 0.25 )
-        # vert_dist = self.rect.bottom - bar.rect.top
-        # if vert_dist < 0:
-        #     dist
-        #     dist *= (np.log(abs((1/vert_dist)))+7)
-        # #print(dist)
+        # gives the agent reward if bar's x cor is close to ball's x cor
         dist = self.SCREEN_WIDTH - abs(self.rect.centerx - bar.rect.centerx)
-        return bounce * 0 + dist    #2000
+        # setting 0 as the coefficient means we don't use bounce reward for now
+        return bounce * 0 + dist
 
     def draw(self, screen):
-        #pygame.draw.circle(screen, (255, 255, 255), (self.rect.centerx, self.rect.centery), 5)
         screen.blit(self.img, (self.rect.centerx, self.rect.centery))

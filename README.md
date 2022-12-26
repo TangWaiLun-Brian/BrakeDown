@@ -1,8 +1,11 @@
 ### SetUp Environment
-
+```
 cd AIST1110_Project
+conda create --name aist1110_project
+conda install python
+cd ball_world-game
 pip install -e .
-
+```
 ### Usage
 
 To run as human mode,
