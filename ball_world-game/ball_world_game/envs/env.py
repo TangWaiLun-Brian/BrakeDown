@@ -314,32 +314,38 @@ class CustomEnv(gym.Env):
         total_time = (self.end_time - self.start_time) / 1000
         self.ball.speed = [0,0]
         for acc in self.accelerators: acc.speed = [0,0]
-        self.screen.fill((0,0,0))
-        end_game_message_time = self.font_small.render('Survived time: '+ "{:.1f}".format(total_time) + 's', True, (255,255,255))
-        self.screen.blit(end_game_message_time, (130,450))
-        if self.ball.win == True:
-            if self.end_play == False:
-                self.win_bf_sound.play()
-            end_win = "You Win! :)"
-            end_win_2 = "The ball slows down!"
-        else:
-            if self.end_play == False:
-                self.lose_bf_sound.play()
-            end_win = "You Lose! :("
-            if self.ball.too_fast == True:
-                end_win_2 = "The ball is too fast!"
+        exit_game = False
+        while not exit_game:
+            for event in pygame.event.get():
+                    if event.type == KEYDOWN:
+                        if event.key == K_ESCAPE:
+                            exit_game = True
+            self.screen.fill((0,0,0))
+            end_game_message_time = self.font_small.render('Survived time: '+ "{:.1f}".format(total_time) + 's', True, (255,255,255))
+            self.screen.blit(end_game_message_time, (130,450))
+            if self.ball.win == True:
+                if self.end_play == False:
+                    self.win_bf_sound.play()
+                end_win = "You Win! :)"
+                end_win_2 = "The ball slows down!"
             else:
-                end_win_2 = "The ball escaped! Bye!"
-        self.end_play = True
-        end_game_message_1 = self.font_large.render(end_win, True, (255,255,0))
-        self.screen.blit(end_game_message_1, (125,350))
-        end_game_message_2 = self.font_small.render(end_win_2, True, (255,255,255))
-        self.screen.blit(end_game_message_2, (120,410))
-        end_game_message_3 = self.font_small.render('Press ESC to leave the game', True, (255,255,0))
-        self.screen.blit(end_game_message_3, (75,490))
-        pygame.display.update()
-        self.clock.tick(CustomEnv.metadata['render_fps'])
-        pygame.display.flip()
+                if self.end_play == False:
+                    self.lose_bf_sound.play()
+                end_win = "You Lose! :("
+                if self.ball.too_fast == True:
+                    end_win_2 = "The ball is too fast!"
+                else:
+                    end_win_2 = "The ball escaped! Bye!"
+            self.end_play = True
+            end_game_message_1 = self.font_large.render(end_win, True, (255,255,0))
+            self.screen.blit(end_game_message_1, (125,350))
+            end_game_message_2 = self.font_small.render(end_win_2, True, (255,255,255))
+            self.screen.blit(end_game_message_2, (120,410))
+            end_game_message_3 = self.font_small.render('Press ESC to leave the game', True, (255,255,0))
+            self.screen.blit(end_game_message_3, (75,490))
+            pygame.display.update()
+            self.clock.tick(CustomEnv.metadata['render_fps'])
+            pygame.display.flip()
 
     def close(self):
         if self.screen is not None:
