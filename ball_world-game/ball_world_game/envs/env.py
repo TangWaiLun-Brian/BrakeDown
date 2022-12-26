@@ -309,6 +309,7 @@ class CustomEnv(gym.Env):
             self.end_time = pygame.time.get_ticks()
         total_time = (self.end_time - self.start_time) / 1000
         self.ball.speed = [0,0]
+        for acc in self.accelerators: acc.speed = [0,0]
         self.screen.fill((0,0,0))
         end_game_message_time = self.font_small.render('Survived time: '+ "{:.1f}".format(total_time) + 's', True, (255,255,255))
         self.screen.blit(end_game_message_time, (130,450))
