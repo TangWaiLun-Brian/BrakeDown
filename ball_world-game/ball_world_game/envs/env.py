@@ -241,7 +241,9 @@ class CustomEnv(gym.Env):
                 display_flag = pygame.SHOWN #if self.render_mode != 'train' else pygame.HIDDEN
                 self.screen = pygame.display.set_mode([self.SCREEN_WIDTH, self.SCREEN_HEIGHT], flags=display_flag)
             else:
-                self.screen = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+                display_flag = pygame.HIDDEN
+                #self.screen = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+                self.screen = pygame.display.set_mode([self.SCREEN_WIDTH, self.SCREEN_HEIGHT], flags=display_flag)
 
         #start_page
         if self.render_mode == 'human':

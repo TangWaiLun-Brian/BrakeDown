@@ -7,7 +7,11 @@ from Testing_config import args
 
 def test(env):
     model = build_model(env.observation_space.sample().shape[0], env.action_space.n)
-    model.load_weights('my_dqn_weight_2.h5')
+    try:
+        model.load_weights(args.model_name)
+    except:
+        print(f'Error occured when loading {args.model_name}')
+        exit()
     collect_list = []
     reward_list = []
     success_list = []
