@@ -223,7 +223,8 @@ class CustomEnv(gym.Env):
         #print(observation.shape)
         if self.terminated == True and self.render_mode == 'human' and self.at_end_page == False:
             self.end_page()
-        
+            self.end_play = False
+            self.at_end_page = False
         return observation, reward, self.terminated, info
 
 
