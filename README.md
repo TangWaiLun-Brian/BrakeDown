@@ -5,6 +5,7 @@ conda create --name aist1110_project
 conda install python
 cd ball_world-game
 pip install -e .
+cd ..
 ```
 ### Usage
 
