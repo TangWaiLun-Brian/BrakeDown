@@ -6,16 +6,14 @@ import pygame, random
 from pygame.locals import *
 import random
 
+# For test code
+# from Object import Ball, Rectangle, Collision
 
+# For test AI
+# from ball_world_game.envs.Object import Ball, Rectangle, Collision
 
-#For test code 
-#from Object import Ball, Rectangle, Collision
-
-#For test AI
-#from ball_world_game.envs.Object import Ball, Rectangle, Collision
-
-#For setup.py install
-#from ball_world_game.envs.Object import Ball, Rectangle, Collision
+# For setup.py install
+# from ball_world_game.envs.Object import Ball, Rectangle, Collision
 try:
     from Object import Ball, Rectangle, Collision
 except: 
@@ -45,57 +43,58 @@ class CustomEnv(gym.Env):
         self.num_of_obs = num_of_obs
         self.num_of_br = num_of_br
         self.num_of_acc = num_of_acc
-
+        # initialize the bounding box for state
+        # the two 0s is for padding [making it as shape (4)]
         speed_lower_bound = np.array([-max_speed, -max_speed, 0, 0]).reshape(1, 4)
         speed_upper_bound = np.array([max_speed, max_speed, 0, 0]).reshape(1, 4)
 
         lower_bound.append(speed_lower_bound)
         upper_bound.append(speed_upper_bound)
 
+        # the x, y coordinates of objects have 0 as lower bound
         screen_lower_bound = np.array([0, 0, 0, 0]).repeat(2+self.num_of_obs+self.num_of_br+self.num_of_acc).reshape(-1, 4)
-        #print(screen_lower_bound.shape)
         lower_bound.append(screen_lower_bound)
+        # the x, y coordinate of objects has 450, 800 as upper bound respectively
         screen_upper_bound = np.array([450, 800, 450, 800]).repeat(2+self.num_of_obs+self.num_of_br+self.num_of_acc).reshape(-1, 4)
         upper_bound.append(screen_upper_bound)
-
+        # flatten np array
         lower_bound = np.concatenate(lower_bound, axis=None)
         upper_bound = np.concatenate(upper_bound, axis=None)
-        #print(lower_bound.shape, upper_bound.shape)
-
+        # initialize observation space
         self.observation_space = spaces.box.Box(low=lower_bound, high=upper_bound, shape=((3+self.num_of_obs+self.num_of_br+self.num_of_acc)* 4,), dtype=np.float32)
-        
+
+        # screen dimension
         self.SCREEN_WIDTH = 450
         self.SCREEN_HEIGHT = 800
 
+        # game ending flags: win or lose
         self.terminated = False
         self.win = False
 
+        # record the starting and ending time
         self.start_time = None
         self.end_time = None
 
-        
-        #self.render_mode = bool(int(input("Input the render mode: ")))     # need to change to input (laself.ter) 
         self.render_mode = render_mode
         self.clock = None
         self.screen = None
         self.rng = self.np_random
 
+        # font initialize
         pygame.font.init()
         self.font_small = pygame.font.Font("ball_world-game/ball_world_game/envs/breakout_font.ttf",20)
         self.font_large = pygame.font.Font("ball_world-game/ball_world_game/envs/breakout_font.ttf", 36)
 
         self.previous_obs_collision = -1
-        self.cul_reward = 0
         self.initial_speed = ball_initial_speed
 
         self.main_back = pygame.image.load('ball_world-game/ball_world_game/envs/Image/Main_background.jpg')
 
-
-        #Sound
+        # Sound initialize
         pygame.mixer.init()
         self.end_play = False
         self.at_end_page = False
-
+        # Train mode mute sound
         if self.render_mode == 'train':
             self.sound_hit_obs = None
             self.sound_hit_brake = None
@@ -112,8 +111,7 @@ class CustomEnv(gym.Env):
         return {"relative pos": ((np.array(self.ball.rect.center) - np.array(self.bar.rect.center))**2).sum(),
                 }
     def render(self):
-        
-        #to avoid windows not reponds
+        # to avoid windows not responding
         if self.render_mode == 'train' or self.render_mode == 'test':
             pygame.event.get()
 
@@ -122,16 +120,22 @@ class CustomEnv(gym.Env):
 
         self.screen.fill((0, 0, 0))
         self.screen.blit(self.main_back, (0,0))
+
+        # draw objects
         self.ball.draw(self.screen)
         self.bar.draw(self.screen)
+
         for obstacle in self.obstacles:
             obstacle.draw(self.screen)
+
         for brake in self.brake:
             brake.draw(self.screen)
+
         for accelerator in self.accelerators:
             accelerator.draw(self.screen)
 
-        ### Show time and the speed
+        # Show time, speed and strength
+        # Only display when mode is not 'train'
         if self.render_mode != 'train':
             self.speed_show = self.font_small.render('Speed: ' + '{:.2f}'.format(np.sqrt(self.ball.speed[0]**2 + self.ball.speed[1]**2)), True, (255,150,0))
             self.screen.blit(self.speed_show, (10,10))
@@ -148,33 +152,35 @@ class CustomEnv(gym.Env):
             self.clock.tick(CustomEnv.metadata['render_fps'])
             pygame.display.flip()
 
-
-
-
     def get_state(self):
+        # our state consists of object speed and position with shape 4
+        # For speed, we have [speed_x, speed_y, 0, 0]
+        # For position, we have [top_left_x, top_left_y, right_bottom_x, right_bottom_y]
         state = []
         state.append([self.ball.speed[0], self.ball.speed[1], 0, 0])
-        # ball_coor
+        # ball coordinates
         ball_coor_state = np.array(self.ball.rect)
         ball_coor_state[2:4] += self.ball.rect[0:2]
         state.append(ball_coor_state)
 
-        #bar coor 
+        # bar coordinates
         bar_coor_state = np.array(self.bar.rect)
         bar_coor_state[2:4] += self.bar.rect[0:2]
         state.append(bar_coor_state)
 
-        #obs_coor
+        # obstacle coordinates
         for obstacle in self.obstacles:
             one_obs_coor = np.array(obstacle.rect)
             one_obs_coor[2:4] += obstacle.rect[0:2]
             state.append(one_obs_coor)
 
+        # brake coordinates
         for brake in self.brake:
             one_obs_coor = np.array(brake.rect)
             one_obs_coor[2:4] += brake.rect[0:2]
             state.append(one_obs_coor)
 
+        # accelerator coordinates
         for accelerator in self.accelerators:
             one_obs_coor = np.array(accelerator.rect)
             one_obs_coor[2:4] += accelerator.rect[0:2]
@@ -182,14 +188,19 @@ class CustomEnv(gym.Env):
 
         state = np.concatenate(state,0).reshape(-1,4)
 
-        #print('state:', state.shape)
         return state.reshape(-1)
 
     
     def step(self, action):
+        # update bar position
         self.bar.update(action)
+        # update ball position and check bar collision
         dist = self.ball.update(self.bar, self.sound_hit_bar)
+
+        # a counter for reward of hitting objects
         hit_brake = 0
+
+        # reward for hitting brake
         for br in self.brake:
             if br.update(self.ball,self.rng, self.sound_hit_brake):
                 new_brake = Rectangle.Brake(self.SCREEN_WIDTH, self.rng)
@@ -199,6 +210,7 @@ class CustomEnv(gym.Env):
                 hit_brake += 1
                 self.ball.count += 1
 
+        # penalty for hitting accelerator
         for acc in self.accelerators:
             if acc.update(self.ball,self.rng, self.sound_hit_acc):
                 new_acc = Rectangle.Accelerator(self.SCREEN_WIDTH, self.rng)
@@ -211,19 +223,22 @@ class CustomEnv(gym.Env):
         if self.previous_obs_collision != -1 and self.sound_hit_bar is not None:
             self.sound_hit_obs.play()
 
+        # update terminate flag
         self.terminated = (not self.ball.survive) or self.ball.win
+        # calculate reward
         reward = dist if self.ball.survive else -10000000
         reward += hit_brake * 2000
         if self.ball.win == True:
             reward += 10000000
-        # if self.previous_obs_collision != -1:
-        #     reward -= 500
+
+        # get observation
         observation = self.get_state()
+        # get info
         info = self._get_info()
 
         if self.render_mode != 'train':
             self.render()
-        #print(observation.shape)
+
         if self.terminated == True and self.render_mode == 'human' and self.at_end_page == False:
             self.end_page()
             self.end_play = False
@@ -237,31 +252,33 @@ class CustomEnv(gym.Env):
 
     def reset(self, seed=1, options=None):
         super().reset(seed=seed)
+        # use np_random as the random generator
         self.rng = self.np_random
             
-        # generate screen
+        # create screen
         if self.screen == None:
             pygame.init()
-            if self.render_mode != 'train':#self.render_mode == 'test' or self.render_mode == 'human':
+            if self.render_mode != 'train':
                 pygame.display.init()
-                # need further verify the render mode correct or not
-                display_flag = pygame.SHOWN #if self.render_mode != 'train' else pygame.HIDDEN
+                # show screen for non-train mode
+                display_flag = pygame.SHOWN
                 self.screen = pygame.display.set_mode([self.SCREEN_WIDTH, self.SCREEN_HEIGHT], flags=display_flag)
             else:
+                # hide screen for train mode
                 display_flag = pygame.HIDDEN
-                #self.screen = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
                 self.screen = pygame.display.set_mode([self.SCREEN_WIDTH, self.SCREEN_HEIGHT], flags=display_flag)
 
-        #start_page
+        # start_page
         if self.render_mode == 'human':
             self.start_page()
         else:
             self.start_time = pygame.time.get_ticks()
 
-        # Need to further check self. 
+        # Initialize Objects
         self.ball = Ball.Ball(self.SCREEN_WIDTH, self.SCREEN_HEIGHT, self.screen, self.rng, self.initial_speed)
         self.bar = Rectangle.ControlBar((225, 650), 70, 10, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
         self.obstacles = [Rectangle.Obstacle(self.SCREEN_WIDTH, self.rng) for i in range(self.num_of_obs)]
+
         self.brake = []
         for i in range(self.num_of_br):
             brake = Rectangle.Brake(self.SCREEN_WIDTH, self.rng)
@@ -284,7 +301,7 @@ class CustomEnv(gym.Env):
         
         self.render()
               
-        return state  #ball, bar and obstaicles cooridnate
+        return state
 
     def start_page(self):
         self.start_bg_sound = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Starting_page.mp3')
@@ -292,6 +309,7 @@ class CustomEnv(gym.Env):
         start = False
         self.screen.fill((0, 0, 0))
         while not start:
+            # check close start page
             for event in pygame.event.get():
                     if event.type == KEYDOWN:
                         if event.key == K_SPACE:
@@ -326,13 +344,17 @@ class CustomEnv(gym.Env):
         for acc in self.accelerators: acc.speed = [0,0]
         exit_game = False
         while not exit_game:
+            # check close end page
             for event in pygame.event.get():
                     if event.type == KEYDOWN:
                         if event.key == K_ESCAPE:
                             exit_game = True
+
             self.screen.fill((0,0,0))
             end_game_message_time = self.font_small.render('Survived time: '+ "{:.1f}".format(total_time) + 's', True, (255,255,255))
             self.screen.blit(end_game_message_time, (130,450))
+
+            # display wordings for the result
             if self.ball.win == True:
                 if self.end_play == False:
                     self.win_bf_sound.play()
@@ -346,6 +368,7 @@ class CustomEnv(gym.Env):
                     end_win_2 = "The ball is too fast!"
                 else:
                     end_win_2 = "The ball escaped! Bye!"
+
             self.end_play = True
             end_game_message_1 = self.font_large.render(end_win, True, (255,255,0))
             self.screen.blit(end_game_message_1, (125,350))
@@ -366,28 +389,28 @@ class CustomEnv(gym.Env):
 
 
 
-######### Test code ########
-if __name__ == '__main__':
-    #print("HI")
-    test = CustomEnv(render_mode='human')
-    running = True
-
-    test.reset()
-    while running: 
-        pressed_keys = pygame.key.get_pressed()
-        action = 1
-        if pressed_keys[K_LEFT]:
-            action = 0
-        if pressed_keys[K_RIGHT]:
-            action = 2
-
-        ob, rew, terminated, info = test.step(action)
-
-                    
-          
-        for event in pygame.event.get():
-            if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    test.close()
-                    running = False
-           
+# ######### Test code ########
+# if __name__ == '__main__':
+#     #print("HI")
+#     test = CustomEnv(render_mode='human')
+#     running = True
+#
+#     test.reset()
+#     while running:
+#         pressed_keys = pygame.key.get_pressed()
+#         action = 1
+#         if pressed_keys[K_LEFT]:
+#             action = 0
+#         if pressed_keys[K_RIGHT]:
+#             action = 2
+#
+#         ob, rew, terminated, info = test.step(action)
+#
+#
+#
+#         for event in pygame.event.get():
+#             if event.type == KEYDOWN:
+#                 if event.key == K_ESCAPE:
+#                     test.close()
+#                     running = False
+#

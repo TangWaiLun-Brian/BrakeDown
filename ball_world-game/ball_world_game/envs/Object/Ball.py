@@ -21,6 +21,7 @@ class Ball(pygame.sprite.Sprite):
         self.survive = True
         self.win = False
         self.too_fast = False
+
         self.SCREEN_WIDTH = SCREEN_WIDTH
         self.SCREEN_HEIGHT = SCREEN_HEIGHT
         # initialize the speed x
@@ -32,9 +33,6 @@ class Ball(pygame.sprite.Sprite):
         self.count = 0
         #for testing
         #self.speed = [0, 0]
-
-
-
 
     def update(self,  bar, sound_hit_bar):
 
