@@ -137,8 +137,11 @@ class CustomEnv(gym.Env):
             self.screen.blit(self.speed_show, (10,10))
             cur_time = pygame.time.get_ticks()
             survived_time = (cur_time - self.start_time) / 1000
-            sur_time_message = self.font_small.render('Survived time: '+ "{:.1f}".format(survived_time) + 's', True, (255,150,0))
+            sur_time_message = self.font_small.render('time: '+ "{:.1f}".format(survived_time) + 's', True, (255,150,0))
             self.screen.blit(sur_time_message, (150,10))
+            strength = 5 - self.ball.count
+            strength_message = self.font_small.render(f'strength: {strength}', True, (255,150,0))
+            self.screen.blit(strength_message, (300,10))
 
         if self.render_mode != 'train' and self.terminated != True:
             pygame.display.update()
