@@ -138,7 +138,7 @@ def main(env):
 
     print('Finish Training. Saving Model...')
     if args.save_model:
-        target_model.save_weights('my_dqn_weight_2.h5', overwrite=True)
+        target_model.save_weights(args.model_name, overwrite=True)
 
     episode_list = np.arange(max_episodes)
     # plot graphs
@@ -159,6 +159,6 @@ def main(env):
 
 
 if __name__ == '__main__':
-    env = gym.make('ball_world_game/env_main-v0', render_mode=args.mode, num_of_obs=args.num_of_obs, num_of_br=args.num_of_br, num_of_acc=args.num_of_acc, ball_initial_speed=args.ball_initial_speed)
+    env = gym.make('ball_world_game/env_main-v0', render_mode=args.mode if not args.v else 'test', num_of_obs=args.num_of_obs, num_of_br=args.num_of_br, num_of_acc=args.num_of_acc, ball_initial_speed=args.ball_initial_speed)
     main(env)
 

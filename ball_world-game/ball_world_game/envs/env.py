@@ -281,6 +281,7 @@ class CustomEnv(gym.Env):
         self.start_bg_sound = pygame.mixer.Sound('ball_world-game/ball_world_game/envs/Music/Starting_page.mp3')
         self.start_bg_sound.play(-1)
         start = False
+        self.screen.fill((0, 0, 0))
         while not start:
             for event in pygame.event.get():
                     if event.type == KEYDOWN:

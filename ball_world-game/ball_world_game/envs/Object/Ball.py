@@ -31,7 +31,7 @@ class Ball(pygame.sprite.Sprite):
         self.initial_speed = initial_speed
         self.count = 0
         #for testing
-        #add self.speed = [0, 0]
+        #self.speed = [0, 0]
 
         #Sound
 

@@ -59,6 +59,9 @@ def main(env):
 
 
 if __name__ == '__main__':
-    env = gym.make('ball_world_game/env_main-v0', render_mode=args.mode, num_of_obs=args.num_of_obs,
+    mode = args.mode
+    if mode == 'human_rand':
+        mode = 'test' if args.v else 'train'
+    env = gym.make('ball_world_game/env_main-v0', render_mode=mode, num_of_obs=args.num_of_obs,
                    num_of_br=args.num_of_br, num_of_acc=args.num_of_acc, ball_initial_speed=args.ball_initial_speed)
     main(env)
