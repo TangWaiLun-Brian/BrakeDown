@@ -12,8 +12,7 @@ from keras.optimizers import Adam
 
 # not sure if the import within calling any agent or method is valid but it does speed up training
 from Training_config import args
-if not args.speed_down:
-    import rl.agents
+
 
 def build_model(states, actions):            # pass states from the envirnment and action into the model
     model = Sequential()

@@ -5,6 +5,8 @@ import random
 import ball_world_game
 from Testing_config import args
 
+if not args.disable_speed_up:
+    import rl.agents
 def test(env):
     # construct model
     model = build_model(env.observation_space.sample().shape[0], env.action_space.n)

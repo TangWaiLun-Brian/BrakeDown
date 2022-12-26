@@ -23,5 +23,5 @@ parser.add_argument('-v', action='store_true')
 parser.add_argument('--save_model', type=bool, default=True)
 # Setting to the third model name to avoid over-written the pretrained models
 parser.add_argument('--model_name', type=str, default='my_dqn_weight_3.h5')
-parser.add_argument('-speed_down', action='store_true')
+parser.add_argument('-disable_speed_up', action='store_true')
 args = parser.parse_args()

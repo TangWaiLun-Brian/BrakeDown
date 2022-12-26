@@ -6,6 +6,8 @@ import random
 import ball_world_game
 import matplotlib.pyplot as plt
 
+if not args.disable_speed_up:
+    import rl.agents
 
 
 def train(replay_memory, model, target_model):

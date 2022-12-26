@@ -13,5 +13,5 @@ parser.add_argument('--mode', type=str, choices=['test'], default='test')
 parser.add_argument('-v', action='store_true')
 # Our current model is 'my_dqn_weight_2.h5'
 parser.add_argument('--model_name', type=str, default='my_dqn_weight_2.h5')
-
+parser.add_argument('-disable_speed_up', action='store_true')
 args = parser.parse_args()
