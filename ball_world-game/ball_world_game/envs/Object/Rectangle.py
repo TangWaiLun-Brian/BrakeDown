@@ -43,7 +43,7 @@ class Obstacle(Rectangle):
         height = rng.integers(9, 60)
         centerx = rng.integers(width // 2, SCREEN_WIDTH - width //2)
         centery = rng.integers(height//2, 390 - height // 2)
-        super(Obstacle, self).__init__((centerx, centery), width, height)
+        super(Obstacle, self).__init__((centerx, centery), width, height, color=(152, 181, 227))
 
 class Brake(Rectangle):
     def __init__(self, SCREEN_WIDTH, rng):

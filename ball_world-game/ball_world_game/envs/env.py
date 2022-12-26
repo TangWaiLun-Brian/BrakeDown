@@ -88,6 +88,8 @@ class CustomEnv(gym.Env):
         self.cul_reward = 0
         self.initial_speed = ball_initial_speed
 
+        self.main_back = pygame.image.load('ball_world-game/ball_world_game/envs/Image/Main_background.jpg')
+
 
         #Sound
         pygame.mixer.init()
@@ -118,6 +120,7 @@ class CustomEnv(gym.Env):
             self.clock = pygame.time.Clock()
 
         self.screen.fill((0, 0, 0))
+        self.screen.blit(self.main_back, (0,0))
         self.ball.draw(self.screen)
         self.bar.draw(self.screen)
         for obstacle in self.obstacles:
