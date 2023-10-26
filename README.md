@@ -1,3 +1,16 @@
+<p style="text-align: center;"><h1>BrakeDown</h1>By Tang Wai Lun & Mok Hon Wang</p> 
+
+
+![Alt text](image.png)
+
+### Genre of BrakeDown 
+BrakeDown is a 2D action game which is inspired by the classical game, Breakout, in concept and completely developed by us from scratch. We implemented the game with pygame and also created an agent to play the game with Deep Q-learning (DQN) in reinforcement learning
+
+In the game, a moving ball is trying to escape from the prison from the bottom. However, since the ball is with strong strength, guardians are not able to catch the ball. Being the last-ditch defence of the prison, the player is going to control an indestructible horizontal bar near the bottom of the screen. However, the bar cannot catch the ball but rebound the moving ball and avoid the ball from escaping. By controlling the hitting point of the ball on the bar, the player can control the rebounded angle of the ball. 
+
+
+
+
 ### SetUp Environment
 
 ```
@@ -8,6 +21,22 @@ cd ball_world-game
 pip install -e .
 cd ..
 ```
+
+### Agent training
+Agent is implement with 2 model, main doel and target model, in Deep Q-learning. 
+
+Epsilon-Greedy Exploration Strategy is chosen. In this strategy, the agent will explore more actions by random at first and add in more network movements along with the increase in episodes. 
+
+Memory Replay as the Off-Policy is adopted. The agent uses memory replay to store the latest experience. 
+
+The main model is trained on a minibatch of past experience according to the Bellman Equation every 4 steps and update the target model every 100 steps.
+
+The training part of deep Q-Learning is implemented with reference to (*) and (**).
+
+
+### Class diagram
+![Alt text](image-1.png)
+
 
 ### Usage
 
@@ -45,9 +74,9 @@ Python / Pygame tutorial: Collisions between static and moving objects. Youtube.
 
 Deep Q-Learning module (DQN_train.py):
 
-Deep Q-Learning Tutorial: minDQN. By Mike Wang. Medium. url [https://towardsdatascience.com/deep-q-learning-tutorial-mindqn-2a4c855abffc](https://towardsdatascience.com/deep-q-learning-tutorial-mindqn-2a4c855abffc)
+(*)Deep Q-Learning Tutorial: minDQN. By Mike Wang. Medium. url [https://towardsdatascience.com/deep-q-learning-tutorial-mindqn-2a4c855abffc](https://towardsdatascience.com/deep-q-learning-tutorial-mindqn-2a4c855abffc)
 
-minDQN. Github. url:[https://github.com/mswang12/minDQN/blob/main/minDQN.py](https://github.com/mswang12/minDQN/blob/main/minDQN.py)
+(**)minDQN. Github. url:[https://github.com/mswang12/minDQN/blob/main/minDQN.py](https://github.com/mswang12/minDQN/blob/main/minDQN.py)
 
 #### Music
 
